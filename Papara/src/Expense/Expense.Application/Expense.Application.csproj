@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Base\Base.Application\Base.Application.csproj" />
+    <ProjectReference Include="..\Expense.Domain\Expense.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\EmployeeAddresses\Commands\Create\" />
+    <Folder Include="Features\EmployeeAddresses\Commands\Delete\" />
+    <Folder Include="Features\EmployeeAddresses\Commands\Update\" />
+    <Folder Include="Features\EmployeeAddresses\Models\" />
+    <Folder Include="Features\EmployeeAddresses\Queries\Get\" />
+    <Folder Include="Features\EmployeeAddresses\Queries\GetAll\" />
+    <Folder Include="Features\EmployeeAddresses\Validators\" />
+    <Folder Include="Features\EmployeeDepartments\Commands\Create\" />
+    <Folder Include="Features\EmployeeDepartments\Commands\Delete\" />
+    <Folder Include="Features\EmployeeDepartments\Commands\Update\" />
+    <Folder Include="Features\EmployeeDepartments\Models\" />
+    <Folder Include="Features\EmployeeDepartments\Queries\" />
+    <Folder Include="Features\EmployeeDepartments\Validators\" />
+    <Folder Include="Features\EmployeePhone\Commands\Create\" />
+    <Folder Include="Features\EmployeePhone\Commands\Delete\" />
+    <Folder Include="Features\EmployeePhone\Commands\Update\" />
+    <Folder Include="Features\EmployeePhone\Models\" />
+    <Folder Include="Features\EmployeePhone\Queries\" />
+    <Folder Include="Features\EmployeePhone\Validators\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
+  </ItemGroup>
+
+</Project>

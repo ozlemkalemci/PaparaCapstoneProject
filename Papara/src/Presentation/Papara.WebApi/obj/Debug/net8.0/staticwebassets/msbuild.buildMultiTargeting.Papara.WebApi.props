@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Papara.WebApi.props" />
+</Project>
