@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
       "projectName": "Base.Domain",
-      "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
+      "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
       "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\obj\\",
+      "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

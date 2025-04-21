@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj": {}
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj",
         "projectName": "Base.Application",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj"
               }
             }
           }
@@ -88,14 +88,14 @@
         }
       }
     },
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
         "projectName": "Base.Domain",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -154,14 +154,14 @@
         }
       }
     },
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
         "projectName": "Base.Infrastructure",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -183,8 +183,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
               }
             }
           }
@@ -234,14 +234,14 @@
         }
       }
     },
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj",
         "projectName": "Expense.Application",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -263,11 +263,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
               },
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj"
               }
             }
           }
@@ -313,14 +313,14 @@
         }
       }
     },
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj",
         "projectName": "Expense.Domain",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\Expense.Domain.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Domain\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -342,8 +342,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Domain\\Base.Domain.csproj"
               }
             }
           }
@@ -383,14 +383,14 @@
         }
       }
     },
-    "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj": {
+    "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj",
         "projectName": "Expense.Infrastructure",
-        "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Infrastructure\\Expense.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -412,11 +412,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj"
               },
-              "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
-                "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj"
+              "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
+                "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj"
               }
             }
           }

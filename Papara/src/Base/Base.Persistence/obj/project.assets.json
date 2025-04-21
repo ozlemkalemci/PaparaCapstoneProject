@@ -2913,11 +2913,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Persistence\\Base.Persistence.csproj",
+      "projectUniqueName": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Persistence\\Base.Persistence.csproj",
       "projectName": "Base.Persistence",
-      "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Persistence\\Base.Persistence.csproj",
+      "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Persistence\\Base.Persistence.csproj",
       "packagesPath": "C:\\Users\\lonovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Persistence\\obj\\",
+      "outputPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Persistence\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2939,11 +2939,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
-              "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
+            "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj": {
+              "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Application\\Base.Application.csproj"
             },
-            "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
-              "projectPath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj"
+            "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj": {
+              "projectPath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Expense\\Expense.Application\\Expense.Application.csproj"
             }
           }
         }

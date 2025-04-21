@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JTjH+xeWbIg=",
+  "dgSpecHash": "zd5HhUaX0d4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\lonovo\\Desktop\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\lonovo\\Documents\\GitHub\\PaparaCapstoneProject\\Papara\\src\\Base\\Base.Infrastructure\\Base.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lonovo\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\lonovo\\.nuget\\packages\\fluentvalidation\\11.5.1\\fluentvalidation.11.5.1.nupkg.sha512",
