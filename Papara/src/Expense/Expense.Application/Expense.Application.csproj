@@ -7,30 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Base\Base.Application\Base.Application.csproj" />
-    <ProjectReference Include="..\Expense.Domain\Expense.Domain.csproj" />
+    <Compile Remove="Features\EmployeeAddresses\**" />
+    <Compile Remove="Features\EmployeePhone\**" />
+    <EmbeddedResource Remove="Features\EmployeeAddresses\**" />
+    <EmbeddedResource Remove="Features\EmployeePhone\**" />
+    <None Remove="Features\EmployeeAddresses\**" />
+    <None Remove="Features\EmployeePhone\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\EmployeeAddresses\Commands\Create\" />
-    <Folder Include="Features\EmployeeAddresses\Commands\Delete\" />
-    <Folder Include="Features\EmployeeAddresses\Commands\Update\" />
-    <Folder Include="Features\EmployeeAddresses\Models\" />
-    <Folder Include="Features\EmployeeAddresses\Queries\Get\" />
-    <Folder Include="Features\EmployeeAddresses\Queries\GetAll\" />
-    <Folder Include="Features\EmployeeAddresses\Validators\" />
-    <Folder Include="Features\EmployeeDepartments\Commands\Create\" />
-    <Folder Include="Features\EmployeeDepartments\Commands\Delete\" />
-    <Folder Include="Features\EmployeeDepartments\Commands\Update\" />
-    <Folder Include="Features\EmployeeDepartments\Models\" />
-    <Folder Include="Features\EmployeeDepartments\Queries\" />
-    <Folder Include="Features\EmployeeDepartments\Validators\" />
-    <Folder Include="Features\EmployeePhone\Commands\Create\" />
-    <Folder Include="Features\EmployeePhone\Commands\Delete\" />
-    <Folder Include="Features\EmployeePhone\Commands\Update\" />
-    <Folder Include="Features\EmployeePhone\Models\" />
-    <Folder Include="Features\EmployeePhone\Queries\" />
-    <Folder Include="Features\EmployeePhone\Validators\" />
+    <ProjectReference Include="..\..\Base\Base.Application\Base.Application.csproj" />
+    <ProjectReference Include="..\Expense.Domain\Expense.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

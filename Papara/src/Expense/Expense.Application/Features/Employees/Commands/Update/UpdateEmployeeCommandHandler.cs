@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Expense.Application.Features.Employees.Commands.Update;
 
-public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeResponseDto>
+public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeResponse>
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IUserContextService _userContextService;
@@ -18,7 +18,7 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
 		_userContextService = userContextService;
 	}
 
-	public async Task<EmployeeResponseDto> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
+	public async Task<EmployeeResponse> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
 	{
 		var entity = await _unitOfWork.Repository<Employee>().GetByIdAsync(request.Id);
 		if (entity == null)

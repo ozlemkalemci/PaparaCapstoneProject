@@ -1,6 +1,6 @@
 ﻿namespace Expense.Application.Features.Employees.Models;
 
-public class GetEmployeeQueryRequest
+public class GetEmployeeRequest
 {
 	public long? DepartmentId { get; set; }
 	public bool IncludeUser { get; set; } = false;

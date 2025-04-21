@@ -5,9 +5,9 @@ namespace Expense.Application.Features.Employees.Converters;
 
 public static class EmployeeConverters
 {
-	public static EmployeeResponseDto EmployeeConverter(Employee item)
+	public static EmployeeResponse EmployeeConverter(Employee item)
 	{
-		return new EmployeeResponseDto
+		return new EmployeeResponse
 		{
 			Id = item.Id,
 			FirstName = item.FirstName,
@@ -21,10 +21,10 @@ public static class EmployeeConverters
 		};
 	}
 
-	public static List<EmployeeResponseDto> EmployeeConverterList(List<Employee> items)
+	public static List<EmployeeResponse> EmployeeConverterList(List<Employee> items)
 	{
 		if (items == null || items.Count == 0)
-			return new List<EmployeeResponseDto>();
+			return new List<EmployeeResponse>();
 
 		var responseDto = (from item in items select EmployeeConverter(item)).ToList();
 

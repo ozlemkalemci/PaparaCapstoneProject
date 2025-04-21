@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace Expense.Application.Features.Employees.Queries.GetAll;
 
-public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, List<EmployeeResponseDto>>
+public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, List<EmployeeResponse>>
 {
 	private readonly IUnitOfWork _unitOfWork;
 
@@ -17,14 +17,15 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<List<EmployeeResponseDto>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
+	public async Task<List<EmployeeResponse>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
 	{
 		var filter = (Expression<Func<Employee, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Employee, object>>>();
 
 		if (request.Request.DepartmentId.HasValue)
 		{
-			filter = filter.And(x => x.DepartmentId == request.Request.DepartmentId.Value);
+			filter = filter.And(x => x.DepartmentId == request.Request.DepartmentId);
+			
 		}
 
 		if (request.Request.IncludeDepartment)

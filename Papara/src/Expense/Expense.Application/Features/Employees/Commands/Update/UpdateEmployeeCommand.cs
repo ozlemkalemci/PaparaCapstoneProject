@@ -3,12 +3,12 @@ using MediatR;
 
 namespace Expense.Application.Features.Employees.Commands.Update;
 
-public class UpdateEmployeeCommand : IRequest<EmployeeResponseDto>
+public class UpdateEmployeeCommand : IRequest<EmployeeResponse>
 {
 	public long Id { get; set; }
-	public UpdateEmployeeRequestDto Request { get; set; }
+	public UpdateEmployeeRequest Request { get; set; }
 
-	public UpdateEmployeeCommand(long id, UpdateEmployeeRequestDto request)
+	public UpdateEmployeeCommand(long id, UpdateEmployeeRequest request)
 	{
 		Id = id;
 		Request = request;

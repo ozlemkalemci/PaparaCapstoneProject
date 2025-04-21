@@ -1,6 +1,6 @@
 ﻿namespace Expense.Application.Features.Employees.Models;
 
-public class EmployeeRequestDto
+public class CreateEmployeeRequest
 {
 	public string Email { get; set; } = null!;
 	public string FirstName { get; set; } = null!;
