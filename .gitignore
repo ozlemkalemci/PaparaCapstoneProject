@@ -1,11 +1,29 @@
-bin/
-obj/
+
+# Visual Studio User Files
 .vs/
 *.user
 *.suo
-*.cache
-*.pdb
-*.dll
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
 **/bin/
 **/obj/
 
+# VS Cache
+*.cache
+*.pdb
+*.dll
+*.mdb
+*.dbmdl
+*.bak
+
+# Rider & Resharper
+.idea/
+*.sln.iml
+
+# System
+.DS_Store
+Thumbs.db
