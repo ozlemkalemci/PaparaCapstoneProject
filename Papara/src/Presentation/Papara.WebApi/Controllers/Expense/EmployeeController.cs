@@ -31,7 +31,7 @@ public class EmployeesController : ApiControllerBase
 		return Ok(result);
 	}
 
-	[HttpGet]
+	[HttpGet("{id:long}")]
 	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetById(long id)
 	{
@@ -53,7 +53,7 @@ public class EmployeesController : ApiControllerBase
 		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
 	}
 
-	[HttpPut]
+	[HttpPut("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Update(long id, [FromBody] UpdateEmployeeRequest request)
 	{
@@ -61,7 +61,7 @@ public class EmployeesController : ApiControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete]
+	[HttpDelete("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Delete(long id)
 	{

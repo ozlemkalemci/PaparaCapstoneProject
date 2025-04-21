@@ -1,5 +1,4 @@
-﻿using Base.Application.Interfaces;
-using Expense.Application.Features.EmployeeDepartments.Commands.Create;
+﻿using Expense.Application.Features.EmployeeDepartments.Commands.Create;
 using Expense.Application.Features.EmployeeDepartments.Commands.Delete;
 using Expense.Application.Features.EmployeeDepartments.Commands.Update;
 using Expense.Application.Features.EmployeeDepartments.Models;
