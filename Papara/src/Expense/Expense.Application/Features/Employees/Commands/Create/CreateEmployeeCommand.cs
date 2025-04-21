@@ -3,11 +3,11 @@ using Expense.Application.Features.Employees.Models;
 
 namespace Expense.Application.Features.Employees.Commands.Create;
 
-public class CreateEmployeeCommand : IRequest<EmployeeResponseDto>
+public class CreateEmployeeCommand : IRequest<EmployeeResponse>
 {
-	public EmployeeRequestDto Request { get; set; }
+	public CreateEmployeeRequest Request { get; set; }
 
-	public CreateEmployeeCommand(EmployeeRequestDto request)
+	public CreateEmployeeCommand(CreateEmployeeRequest request)
 	{
 		Request = request;
 	}

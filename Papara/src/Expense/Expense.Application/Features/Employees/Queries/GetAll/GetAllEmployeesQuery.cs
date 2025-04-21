@@ -3,11 +3,11 @@ using MediatR;
 
 namespace Expense.Application.Features.Employees.Queries.GetAll;
 
-public class GetAllEmployeesQuery : IRequest<List<EmployeeResponseDto>>
+public class GetAllEmployeesQuery : IRequest<List<EmployeeResponse>>
 {
-	public GetEmployeeQueryRequest Request { get; set; }
+	public GetEmployeeRequest Request { get; set; }
 
-	public GetAllEmployeesQuery(GetEmployeeQueryRequest request)
+	public GetAllEmployeesQuery(GetEmployeeRequest request)
 	{
 		Request = request;
 	}

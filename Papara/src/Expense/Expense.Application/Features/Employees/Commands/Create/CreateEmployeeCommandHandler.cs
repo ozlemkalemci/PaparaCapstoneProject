@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Expense.Application.Features.Employees.Handlers;
 
-public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeResponseDto>
+public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeResponse>
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IUserContextService _userContextService;
@@ -19,7 +19,7 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 		_userContextService = userContextService;
 	}
 
-	public async Task<EmployeeResponseDto> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+	public async Task<EmployeeResponse> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
 	{
 		var dto = request.Request;
 

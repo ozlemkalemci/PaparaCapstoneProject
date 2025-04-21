@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Expense.Application.Features.Employees.Models;
 
-public class UpdateEmployeeRequestDto
+public class UpdateEmployeeRequest
 {
 	public string Email { get; set; } = null!;
 	public long DepartmentId { get; set; }

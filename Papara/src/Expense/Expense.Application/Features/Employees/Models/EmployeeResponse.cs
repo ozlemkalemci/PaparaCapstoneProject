@@ -1,6 +1,6 @@
 ﻿namespace Expense.Application.Features.Employees.Models;
 
-public class EmployeeResponseDto
+public class EmployeeResponse
 {
 	public long Id { get; set; }
 	public string Email { get; set; } = null!;

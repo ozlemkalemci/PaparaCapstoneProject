@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Expense.Application.Features.Employees.Queries.Get;
 
-public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery, EmployeeResponseDto>
+public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery, EmployeeResponse>
 {
 	private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<EmployeeResponseDto> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
+	public async Task<EmployeeResponse> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
 	{
 		var employee = await _unitOfWork.Repository<Employee>().GetByIdAsync(request.Id);
 
