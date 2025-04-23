@@ -18,5 +18,10 @@ public class UserContextService : IUserContextService
 		var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 		return long.TryParse(userIdClaim, out var id) ? id : null;
 	}
+	public string? GetCurrentUserRole()
+	{
+		var roleClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+		return roleClaim;
+	}
 
 }

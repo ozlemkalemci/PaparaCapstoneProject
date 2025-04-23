@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using Base.Application.Features.Auth.Logins.Models;
 using Base.Application.Interfaces;
-using Base.Domain.Interfaces;
 using Base.Domain.Identity;
-using Base.Application.Features.Auth.Logins.Models;
+using Base.Domain.Interfaces;
+using MediatR;
 
 namespace Base.Application.Features.Auth.Logins.Commands;
 
@@ -44,7 +44,17 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
 
 		var token = _jwtService.GenerateToken(user);
 
-		
+		// Kullanıcının aktif refresh token'ını sil
+		var activeTokens = await _unitOfWork.Repository<RefreshToken>()
+			.GetAllAsync(x => x.UserId == user.Id && x.IsActive);
+
+		if (activeTokens.Any())
+		{
+			foreach (var activeToken in activeTokens)
+				_unitOfWork.Repository<RefreshToken>().Delete(activeToken);
+
+			await _unitOfWork.CommitAsync();
+		}
 
 		await _unitOfWork.Repository<RefreshToken>().AddAsync(new RefreshToken
 		{

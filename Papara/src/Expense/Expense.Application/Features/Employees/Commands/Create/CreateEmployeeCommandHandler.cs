@@ -22,6 +22,11 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 	{
 		var dto = request.Request;
 
+		var activeEmployeeExists = await _unitOfWork.Repository<Employee>().AnyAsync(e => e.UserId == dto.UserId && e.IsActive);
+
+		if (activeEmployeeExists)
+			throw new InvalidOperationException("Bu kullanıcıya ait zaten aktif bir çalışan mevcut.");
+
 		var entity = new Employee
 		{
 			Email = dto.Email,
