@@ -1,12 +1,13 @@
 using Base.Application;
+using Base.Application.Interfaces;
+using Base.Application.Settings;
 using Base.Infrastructure;
-using Base.Infrastructure.Services.Auth;
 using Base.Persistence;
 using Expense.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			ValidateIssuerSigningKey = true,
 			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
 			ClockSkew = TimeSpan.Zero
+		};
+		// Redis Blacklist kontrolü
+		options.Events = new JwtBearerEvents
+		{
+			OnTokenValidated = async context =>
+			{
+				var jti = context.Principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+				var redisHelper = context.HttpContext.RequestServices.GetRequiredService<IRedisService>();
+
+				if (!string.IsNullOrEmpty(jti) && await redisHelper.IsBlacklistedAsync(jti))
+				{
+					context.Fail("Token is blacklisted.");
+				}
+			}
 		};
 	});
 

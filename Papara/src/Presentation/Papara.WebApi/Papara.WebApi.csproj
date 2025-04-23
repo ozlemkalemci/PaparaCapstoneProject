@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Base\Base.Infrastructure\Base.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Base\Base.Persistence\Base.Persistence.csproj" />
-    <ProjectReference Include="..\..\Base\Base.Infrastructure\Base.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Expense\Expense.Infrastructure\Expense.Infrastructure.csproj" />
   </ItemGroup>
 

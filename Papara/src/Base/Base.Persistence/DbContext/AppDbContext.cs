@@ -9,8 +9,9 @@ namespace Base.Persistence.DbContext
 	{
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-		// Core
+		// Base
 		public DbSet<User> Users => Set<User>();
+		public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
 		// Expense
 		public DbSet<Employee> Employees => Set<Employee>();

@@ -1,12 +1,11 @@
 ﻿using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
-using Expense.Application.Features.Employees.Commands.Create;
 using Expense.Application.Features.Employees.Converters;
 using Expense.Application.Features.Employees.Models;
 using Expense.Domain.Entities;
 using MediatR;
 
-namespace Expense.Application.Features.Employees.Handlers;
+namespace Expense.Application.Features.Employees.Commands.Create;
 
 public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeResponse>
 {
