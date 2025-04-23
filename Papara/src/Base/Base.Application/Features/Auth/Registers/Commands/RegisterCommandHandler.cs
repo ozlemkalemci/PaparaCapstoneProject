@@ -1,12 +1,12 @@
 ﻿using MediatR;
-using Base.Application.Features.Auth.Register.Models;
 using Base.Application.Interfaces;
 using Base.Domain.Identity;
 using Base.Domain.Interfaces;
+using Base.Application.Features.Auth.Registers.Models;
 
-namespace Base.Application.Features.Auth.Register.Commands;
+namespace Base.Application.Features.Auth.Registers.Commands;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponseDto>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
 {
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IPasswordHasher _passwordHasher;
@@ -17,7 +17,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 		_passwordHasher = passwordHasher;
 	}
 
-	public async Task<RegisterResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
+	public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
 	{
 		var dto = request.Request;
 
@@ -36,7 +36,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 			UserName = dto.UserName,
 			PasswordHash = passwordHash,
 			Secret = secret,
-			Role = (Domain.Enums.UserRole)dto.Role,
+			Role = dto.Role,
 			OpenDate = DateTimeOffset.UtcNow,
 			IsActive = true,
 			CreatedDate = DateTimeOffset.UtcNow,
@@ -46,7 +46,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 		await _unitOfWork.Repository<User>().AddAsync(user);
 		await _unitOfWork.CommitAsync();
 
-		return new RegisterResponseDto
+		return new RegisterResponse
 		{
 			UserId = user.Id,
 			UserName = user.UserName,

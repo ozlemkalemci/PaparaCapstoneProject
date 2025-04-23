@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Base.Application.Behaviors;
-using Base.Application.Features.Auth.Login.Validators;
+using Base.Application.Features.Auth.Logins.Validators;
 
 
 namespace Base.Application;

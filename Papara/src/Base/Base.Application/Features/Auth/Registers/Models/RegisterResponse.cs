@@ -1,8 +1,8 @@
 ﻿using Base.Domain.Enums;
 
-namespace Base.Application.Features.Auth.Register.Models;
+namespace Base.Application.Features.Auth.Registers.Models;
 
-public class RegisterResponseDto
+public class RegisterResponse
 {
 	public long UserId { get; set; }
 	public string UserName { get; set; } = null!;

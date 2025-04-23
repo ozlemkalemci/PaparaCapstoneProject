@@ -1,6 +1,6 @@
-﻿namespace Base.Application.Features.Auth.Login.Models;
+﻿namespace Base.Application.Features.Auth.Logins.Models;
 
-public class LoginRequestDto
+public class LoginRequest
 {
 	public string UserName { get; set; } = null!;
 	public string Password { get; set; } = null!;
