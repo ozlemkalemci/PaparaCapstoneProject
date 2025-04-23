@@ -1,4 +1,6 @@
-﻿namespace Expense.Application.Features.EmployeeAddresses.Models;
+﻿using Expense.Application.Features.Employees.Models;
+
+namespace Expense.Application.Features.EmployeeAddresses.Models;
 
 public class EmployeeAddressResponse
 {
@@ -7,4 +9,6 @@ public class EmployeeAddressResponse
 	public string District { get; set; } = null!;
 	public string Detail { get; set; } = null!;
 	public long EmployeeId { get; set; }
+
+	public EmployeeResponse? ResponseEmployee { get; set; }
 }

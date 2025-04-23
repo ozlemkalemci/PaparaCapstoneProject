@@ -1,4 +1,5 @@
 ﻿using Expense.Application.Features.EmployeeAddresses.Models;
+using Expense.Application.Features.Employees.Converters;
 using Expense.Domain.Entities;
 
 namespace Expense.Application.Features.EmployeeAddresses.Converters;
@@ -13,7 +14,9 @@ public static class EmployeeAddressConverters
 			EmployeeId = item.EmployeeId,
 			City = item.City,
 			Detail = item.Detail,
-			District = item.District
+			District = item.District,
+
+			ResponseEmployee = item.Employee == null ? null : EmployeeConverters.EmployeeConverter(item.Employee)
 		};
 	}
 

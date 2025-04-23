@@ -4,6 +4,7 @@ using Base.Domain.Identity;
 using Base.Domain.Interfaces;
 using Base.Persistence.DbContext;
 using Base.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Base.Persistence.UnitOfWork;
 
@@ -35,5 +36,11 @@ public class UnitOfWork : IUnitOfWork
 	public async Task<int> CommitAsync() => await _context.SaveChangesAsync();
 
 	public void Dispose() => _context.Dispose();
+
+	public ITransaction BeginTransaction()
+	{
+		var transaction = _context.Database.BeginTransaction();
+		return new EfTransaction(transaction);
+	}
 
 }
