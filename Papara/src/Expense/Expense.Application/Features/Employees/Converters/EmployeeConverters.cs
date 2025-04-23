@@ -1,4 +1,7 @@
-﻿using Expense.Application.Features.Employees.Models;
+﻿using Expense.Application.Features.EmployeeAddresses.Converters;
+using Expense.Application.Features.EmployeeDepartments.Converters;
+using Expense.Application.Features.EmployeePhones.Converters;
+using Expense.Application.Features.Employees.Models;
 using Expense.Domain.Entities;
 
 namespace Expense.Application.Features.Employees.Converters;
@@ -17,7 +20,16 @@ public static class EmployeeConverters
 			IdentityNumber = item.IdentityNumber,
 			IBAN = item.IBAN,
 			DepartmentId = item.DepartmentId,
-			UserId = item.UserId
+			UserId = item.UserId,
+
+			ResponseDepartment = item.Department == null ? null :
+				EmployeeDepartmentConverters.EmployeeDepartmentConverter(item.Department),
+
+			ResponsePhones = item.Phones == null ? null :
+				EmployeePhoneConverters.EmployeePhoneConverterList(item.Phones.ToList()),
+
+			ResponseAddresses = item.Addresses == null ? null :
+				EmployeeAddressConverters.EmployeeAddressConverterList(item.Addresses.ToList())
 		};
 	}
 

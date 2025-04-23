@@ -21,9 +21,33 @@ public class DeleteEmployeeCommandHandler : IRequestHandler<DeleteEmployeeComman
 		if (entity == null)
 			throw new KeyNotFoundException("Çalışan bulunamadı.");
 
-		_unitOfWork.Repository<Employee>().Delete(entity);
-		await _unitOfWork.CommitAsync();
+		using var transaction = _unitOfWork.BeginTransaction();
 
-		return Unit.Value;
+		try
+		{
+			var phones = await _unitOfWork.Repository<EmployeePhone>()
+				.Where(p => p.EmployeeId == entity.Id && p.IsActive);
+
+			foreach (var phone in phones)
+				_unitOfWork.Repository<EmployeePhone>().Delete(phone);
+
+			var addresses = await _unitOfWork.Repository<EmployeeAddress>()
+				.Where(p => p.EmployeeId == entity.Id && p.IsActive);
+
+			foreach (var address in addresses)
+				_unitOfWork.Repository<EmployeeAddress>().Delete(address);
+
+			_unitOfWork.Repository<Employee>().Delete(entity);
+
+			await _unitOfWork.CommitAsync();
+			await transaction.CommitAsync();
+
+			return Unit.Value;
+		}
+		catch (Exception)
+		{
+			await transaction.RollbackAsync();
+			throw;
+		}
 	}
 }

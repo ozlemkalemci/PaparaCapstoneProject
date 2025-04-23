@@ -22,7 +22,7 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
 		var filter = (Expression<Func<Employee, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Employee, object>>>();
 
-		if (request.Request.DepartmentId.HasValue)
+		if (request.Request.DepartmentId > 0)
 		{
 			filter = filter.And(x => x.DepartmentId == request.Request.DepartmentId);
 			

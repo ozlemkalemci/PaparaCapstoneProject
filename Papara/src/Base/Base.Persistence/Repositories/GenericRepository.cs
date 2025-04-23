@@ -33,6 +33,9 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
 
 	public void Delete(T entity)
 	{
+		if (!entity.IsActive)
+			return;
+
 		entity.IsActive = false;
 		entity.DeletedDate = DateTimeOffset.UtcNow;
 		entity.DeletedById = _userContextService.GetCurrentUserId();
