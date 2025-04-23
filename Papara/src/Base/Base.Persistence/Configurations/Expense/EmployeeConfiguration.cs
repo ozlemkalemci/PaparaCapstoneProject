@@ -37,10 +37,11 @@ public class EmployeeConfiguration : BaseEntityConfiguration<Employee>
 			.HasMaxLength(34);
 
 		builder.HasOne(e => e.User)
-			.WithOne()
-			.HasForeignKey<Employee>(e => e.UserId)
+			.WithMany()
+			.HasForeignKey(e => e.UserId)
 			.IsRequired(false)
 			.OnDelete(DeleteBehavior.Restrict);
+
 
 		builder.HasOne(e => e.Department)
 			.WithMany(d => d.Employees)

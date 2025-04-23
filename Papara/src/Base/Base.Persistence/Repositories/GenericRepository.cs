@@ -117,4 +117,9 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
 		query = includes.Aggregate(query, (current, include) => current.Include(include));
 		return await query.ToListAsync();
 	}
+	public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+	{
+		return await dbSet.AnyAsync(predicate);
+	}
+
 }

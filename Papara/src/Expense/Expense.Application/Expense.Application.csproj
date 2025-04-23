@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Features\EmployeeAddresses\**" />
     <Compile Remove="Features\EmployeePhone\**" />
-    <EmbeddedResource Remove="Features\EmployeeAddresses\**" />
     <EmbeddedResource Remove="Features\EmployeePhone\**" />
-    <None Remove="Features\EmployeeAddresses\**" />
     <None Remove="Features\EmployeePhone\**" />
   </ItemGroup>
 
