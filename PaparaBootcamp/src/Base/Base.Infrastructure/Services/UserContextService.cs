@@ -23,5 +23,17 @@ public class UserContextService : IUserContextService
 		var roleClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
 		return roleClaim;
 	}
+	public long? GetCurrentEmployeeId()
+	{
+		var employeeIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
+			.FirstOrDefault(c => c.Type == "EmployeeId");
+
+		if (employeeIdClaim != null && long.TryParse(employeeIdClaim.Value, out var employeeId))
+		{
+			return employeeId;
+		}
+
+		return null;
+	}
 
 }

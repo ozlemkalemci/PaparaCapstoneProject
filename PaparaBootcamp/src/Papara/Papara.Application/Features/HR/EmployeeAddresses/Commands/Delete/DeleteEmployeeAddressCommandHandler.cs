@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Domain.Entities.HR;
@@ -24,11 +25,12 @@ public class DeleteEmployeeAddressCommandHandler : IRequestHandler<DeleteEmploye
 		if (entity == null)
 			throw new KeyNotFoundException("Adres bulunamadı.");
 
-		var currentUserId = _userContextService.GetCurrentUserId();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
-		if (currentUserRole == "Employee" && entity.EmployeeId != currentUserId)
-			throw new UnauthorizedAccessException("Bu adrese erişiminiz yok.");
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 
 		_unitOfWork.Repository<EmployeeAddress>().Delete(entity);
 		await _unitOfWork.CommitAsync();

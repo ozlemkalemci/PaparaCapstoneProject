@@ -12,7 +12,7 @@ namespace Papara.WebApi.Controllers.Papara.HR;
 
 [ApiController]
 [Route("api/employeephones")]
-[Authorize(Roles = "Admin,Employee")]
+
 public class EmployeePhoneController : ApiControllerBase
 {
 	public EmployeePhoneController()
@@ -20,6 +20,7 @@ public class EmployeePhoneController : ApiControllerBase
 	}
 
 	[HttpGet]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetAll([FromQuery] GetEmployeePhoneRequest request)
 	{
 		var result = await Mediator.Send(new GetAllEmployeePhonesQuery(request));
@@ -27,6 +28,7 @@ public class EmployeePhoneController : ApiControllerBase
 	}
 
 	[HttpGet("{id:long}")]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetById(long id)
 	{
 		var result = await Mediator.Send(new GetEmployeePhoneByIdQuery(id));
@@ -34,6 +36,7 @@ public class EmployeePhoneController : ApiControllerBase
 	}
 
 	[HttpPost]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> Create([FromBody] CreateEmployeePhoneRequest request)
 	{
 		var result = await Mediator.Send(new CreateEmployeePhoneCommand(request));
@@ -41,6 +44,7 @@ public class EmployeePhoneController : ApiControllerBase
 	}
 
 	[HttpPut("{id:long}")]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> Update(long id, [FromBody] UpdateEmployeePhoneRequest request)
 	{
 		var result = await Mediator.Send(new UpdateEmployeePhoneCommand(id, request));
@@ -48,6 +52,7 @@ public class EmployeePhoneController : ApiControllerBase
 	}
 
 	[HttpDelete("{id:long}")]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> Delete(long id)
 	{
 		await Mediator.Send(new DeleteEmployeePhoneCommand(id));

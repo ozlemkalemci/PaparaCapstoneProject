@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.Finance.Expenses.Converters;
@@ -33,11 +34,11 @@ public class GetExpenseByIdQueryHandler : IRequestHandler<GetExpenseByIdQuery, E
 			throw new KeyNotFoundException("Masraf kaydı bulunamadı.");
 
 		var currentUserRole = _userContextService.GetCurrentUserRole();
-		var currentUserId = _userContextService.GetCurrentUserId();
 
-		// Eğer Employee ise ve başka birinin masrafına erişmeye çalışıyorsa erişim engelle
-		if (currentUserRole == "Employee" && entity.EmployeeId != currentUserId)
-			throw new UnauthorizedAccessException("Başka bir çalışanın masraf kaydına erişemezsiniz.");
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 
 		return ExpenseConverters.ExpenseConverter(entity);
 	}

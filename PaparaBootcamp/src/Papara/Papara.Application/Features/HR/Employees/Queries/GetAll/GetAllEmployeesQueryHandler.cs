@@ -5,29 +5,39 @@ using System.Linq.Expressions;
 using Papara.Application.Features.HR.Employees.Converters;
 using Papara.Application.Features.HR.Employees.Models;
 using Papara.Domain.Entities.HR;
+using Base.Domain.Enums;
+using Base.Application.Interfaces;
 
 namespace Papara.Application.Features.HR.Employees.Queries.GetAll;
 
 public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, List<EmployeeResponse>>
 {
 	private readonly IUnitOfWork _unitOfWork;
+	private readonly IUserContextService _userContextService;
 
-	public GetAllEmployeesQueryHandler(IUnitOfWork unitOfWork)
+	public GetAllEmployeesQueryHandler(IUnitOfWork unitOfWork, IUserContextService userContextService)
 	{
 		_unitOfWork = unitOfWork;
+		_userContextService = userContextService;
 	}
 
 	public async Task<List<EmployeeResponse>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
 	{
 		var filter = (Expression<Func<Employee, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Employee, object>>>();
+		var currentEmpId = _userContextService.GetCurrentEmployeeId();
+		var currentUserRole = _userContextService.GetCurrentUserRole();
+
+		if (currentEmpId > 0 && currentUserRole == UserRole.Employee.GetDisplayName())
+		{
+			filter = filter.And(x => x.Id == currentEmpId);
+		}
 
 		if (request.Request.DepartmentId > 0)
 		{
 			filter = filter.And(x => x.DepartmentId == request.Request.DepartmentId);
-			
-		}
 
+		}
 		if (request.Request.IncludeDepartment)
 		{
 			includes.Add(x => x.Department);
@@ -36,16 +46,6 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
 		if (request.Request.IncludeUser)
 		{
 			includes.Add(x => x.User);
-		}
-		
-		if (request.Request.IncludePhones)
-		{
-			includes.Add(x => x.Phones);
-		}
-		
-		if (request.Request.IncludeAddresses)
-		{
-			includes.Add(x => x.Addresses);
 		}
 
 		var employees = await _unitOfWork.Repository<Employee>()

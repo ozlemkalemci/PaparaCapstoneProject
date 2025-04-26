@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.HR.EmployeeAddresses.Converters;
@@ -12,7 +13,9 @@ public class CreateEmployeeAddressCommandHandler : IRequestHandler<CreateEmploye
 	private readonly IUnitOfWork _unitOfWork;
 	private readonly IUserContextService _userContextService;
 
-	public CreateEmployeeAddressCommandHandler(IUnitOfWork unitOfWork, IUserContextService userContextService)
+	public CreateEmployeeAddressCommandHandler(
+		IUnitOfWork unitOfWork, 
+		IUserContextService userContextService)
 	{
 		_unitOfWork = unitOfWork;
 		_userContextService = userContextService;
@@ -21,6 +24,13 @@ public class CreateEmployeeAddressCommandHandler : IRequestHandler<CreateEmploye
 	public async Task<EmployeeAddressResponse> Handle(CreateEmployeeAddressCommand request, CancellationToken cancellationToken)
 	{
 		var dto = request.Request;
+
+		var currentUserRole = _userContextService.GetCurrentUserRole();
+
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, dto.EmployeeId);
+		}
 
 		var entity = new EmployeeAddress
 		{

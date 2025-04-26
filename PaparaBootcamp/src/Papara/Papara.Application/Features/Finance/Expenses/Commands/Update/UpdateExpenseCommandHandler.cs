@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.Finance.Expenses.Converters;
@@ -20,20 +21,14 @@ public class UpdateExpenseCommandHandler : IRequestHandler<UpdateExpenseCommand,
 
 	public async Task<ExpenseResponse> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
 	{
-		var expense = await _unitOfWork.Repository<Expense>()
+		var entity = await _unitOfWork.Repository<Expense>()
 			.GetByIdAsync(request.Id, x => x.Approvals);
 
-		if (expense == null)
+		if (entity == null)
 			throw new KeyNotFoundException("Masraf kaydı bulunamadı.");
 
-		var currentUserId = _userContextService.GetCurrentUserId();
-		var currentUserRole = _userContextService.GetCurrentUserRole();
-
-		if (currentUserRole == "Employee" && expense.EmployeeId != currentUserId)
-			throw new UnauthorizedAccessException("Başka bir çalışanın masraf kaydını güncelleyemezsiniz.");
-
 		// Masrafın aktif bir approval'ı var mı
-		var activeApproval = expense.Approvals?.FirstOrDefault(x => x.IsActive);
+		var activeApproval = entity.Approvals?.FirstOrDefault(x => x.IsActive);
 
 		if (activeApproval == null)
 			throw new InvalidOperationException("Bu masraf için geçerli bir onay kaydı bulunamadı.");
@@ -41,17 +36,24 @@ public class UpdateExpenseCommandHandler : IRequestHandler<UpdateExpenseCommand,
 		// Sadece Bekliyor (Pending) statüsünde olanlar güncellenebilir
 		if (activeApproval.Status != Domain.Enums.Finance.ExpenseApprovalStatus.Pending)
 			throw new InvalidOperationException("Sadece beklemede olan masraf kayıtları güncellenebilir.");
+		
+		var currentUserRole = _userContextService.GetCurrentUserRole();
+
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 
 		var dto = request.Request;
 
-		expense.Amount = dto.Amount;
-		expense.Description = dto.Description;
-		expense.ExpenseDate = dto.ExpenseDate;
-		expense.ExpenseTypeId = dto.ExpenseTypeId;
+		entity.Amount = dto.Amount;
+		entity.Description = dto.Description;
+		entity.ExpenseDate = dto.ExpenseDate;
+		entity.ExpenseTypeId = dto.ExpenseTypeId;
 
-		_unitOfWork.Repository<Expense>().Update(expense);
+		_unitOfWork.Repository<Expense>().Update(entity);
 		await _unitOfWork.CommitAsync();
 
-		return ExpenseConverters.ExpenseConverter(expense);
+		return ExpenseConverters.ExpenseConverter(entity);
 	}
 }

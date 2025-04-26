@@ -1,4 +1,6 @@
-﻿using Base.Domain.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
+using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Domain.Entities.HR;
 
@@ -8,10 +10,11 @@ public class DeleteEmployeePhoneCommandHandler : IRequestHandler<DeleteEmployeeP
 
 {
 	private readonly IUnitOfWork _unitOfWork;
-
-	public DeleteEmployeePhoneCommandHandler(IUnitOfWork unitOfWork)
+	private readonly IUserContextService _userContextService;
+	public DeleteEmployeePhoneCommandHandler(IUnitOfWork unitOfWork, IUserContextService userContextService)
 	{
 		_unitOfWork = unitOfWork;
+		_userContextService = userContextService;
 	}
 
 	public async Task<Unit> Handle(DeleteEmployeePhoneCommand request, CancellationToken cancellationToken)
@@ -20,6 +23,13 @@ public class DeleteEmployeePhoneCommandHandler : IRequestHandler<DeleteEmployeeP
 
 		if (entity == null)
 			throw new KeyNotFoundException("Telefon bulunamadı.");
+
+		var currentUserRole = _userContextService.GetCurrentUserRole();
+
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 
 		_unitOfWork.Repository<EmployeePhone>().Delete(entity);
 		await _unitOfWork.CommitAsync();

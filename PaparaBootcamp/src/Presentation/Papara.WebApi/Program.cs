@@ -2,13 +2,15 @@ using Base.Application;
 using Base.Application.Interfaces;
 using Base.Application.Settings;
 using Base.Infrastructure;
+using Base.Infrastructure.Middlewares;
 using Base.Persistence;
-using Papara.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Papara.Application;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,9 +46,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
 			ClockSkew = TimeSpan.Zero
 		};
-		// Redis Blacklist kontrolü
+		
+		// Redis Blacklist ve hata kontrolü
 		options.Events = new JwtBearerEvents
 		{
+			OnAuthenticationFailed = context =>
+			{
+				context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+				context.Response.ContentType = "application/json";
+
+				var result = JsonSerializer.Serialize(new { message = "Geçersiz veya süresi dolmuþ token." });
+				return context.Response.WriteAsync(result);
+			},
 			OnTokenValidated = async context =>
 			{
 				var jti = context.Principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
@@ -112,6 +123,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseGlobalExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
