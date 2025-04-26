@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Expense.Application.Features.EmployeePhones.Commands.Delete;
+namespace Papara.Application.Features.HR.EmployeePhones.Commands.Delete;
 
 public class DeleteEmployeePhoneCommand : IRequest<Unit>
 {

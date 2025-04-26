@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\EmployeePhone\**" />
+    <EmbeddedResource Remove="Features\EmployeePhone\**" />
+    <None Remove="Features\EmployeePhone\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Base\Base.Application\Base.Application.csproj" />
+    <ProjectReference Include="..\Papara.Domain\Papara.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Finance\" />
+  </ItemGroup>
+
+</Project>
