@@ -16,7 +16,6 @@ public static class EmployeeConverters
 			FirstName = item.FirstName,
 			MiddleName = item.MiddleName,
 			LastName = item.LastName,
-			Email = item.Email,
 			IdentityNumber = item.IdentityNumber,
 			IBAN = item.IBAN,
 			DepartmentId = item.DepartmentId,

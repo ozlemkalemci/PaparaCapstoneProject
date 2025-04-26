@@ -20,6 +20,10 @@ public class UserConfiguration : BaseEntityConfiguration<User>
 
 		builder.HasIndex(x => x.UserName).IsUnique(true);
 
+		builder.Property(e => e.Email)
+			.IsRequired()
+			.HasMaxLength(150);
+
 		builder.Property(u => u.PasswordHash)
 			.IsRequired();
 
@@ -41,24 +45,26 @@ public class UserConfiguration : BaseEntityConfiguration<User>
 		var now = DateTimeOffset.UtcNow;
 
 		builder.HasData(
-			
+
 			new User
 			{
 				Id = 1,
 				UserName = "admin",
 				PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+				Email = "admin@papara.com",
 				Role = UserRole.Admin,
 				Secret = Guid.NewGuid().ToString(),
 				OpenDate = now,
 				CreatedDate = now,
 				CreatedById = 0,
 				IsActive = true
-			}, 
+			},
 			new User
 			{
 				Id = 2,
 				UserName = "ozlem.kalemci",
 				PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ozlem123"),
+				Email = "ozlem.kalemci@papara.com",
 				Role = UserRole.Employee,
 				Secret = Guid.NewGuid().ToString(),
 				OpenDate = now,
@@ -71,6 +77,7 @@ public class UserConfiguration : BaseEntityConfiguration<User>
 				Id = 3,
 				UserName = "personel1",
 				PasswordHash = BCrypt.Net.BCrypt.HashPassword("personel123"),
+				Email = "personel@papara.com",
 				Role = UserRole.Employee,
 				Secret = Guid.NewGuid().ToString(),
 				OpenDate = now,

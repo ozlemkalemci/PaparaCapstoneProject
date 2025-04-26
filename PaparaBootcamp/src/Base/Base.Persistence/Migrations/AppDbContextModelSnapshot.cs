@@ -94,6 +94,11 @@ namespace Base.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -138,36 +143,39 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "admin@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$.7sdAy6qoezVF3TzizPNleMpeXRCuiF/4wuiLWnYyIisteft7RL4y",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$jsxVbJa4YiHz8.ivpx1Afe2F9pOiTg3x88C2wPBnyqzo4WX6mHtdm",
                             Role = (byte)1,
-                            Secret = "6ba07f5f-73f1-4cf8-8422-10aa82d178d6",
+                            Secret = "ac06738f-8e89-4ac8-adac-8e1deec83e97",
                             UserName = "admin"
                         },
                         new
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "ozlem.kalemci@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$QR4bxK13LlJnVsXw91iESe1Z2h.n.XeyMIxnreyvwGfMtucRKrwzC",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$qzzTA268fQm78sUaiVhIwur54mYGM4jTub/FMjBjH/EPuWbzJuthu",
                             Role = (byte)2,
-                            Secret = "2b3e55ab-f2be-45c5-a4db-b58c854a4f67",
+                            Secret = "d7db060e-145b-419a-97a7-b51f3890ed82",
                             UserName = "ozlem.kalemci"
                         },
                         new
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "personel@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$LE.Gsd.uCbqEZy3SgmSL4OMGexHJtJVIQuC0HKRnMiIG7NA334iEC",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 176, DateTimeKind.Unspecified).AddTicks(1684), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$AUS4Q5.Qf9IA12F3UAOnI.EQnBueFv.cI6uTMoGqm6uZvbPt4idmG",
                             Role = (byte)2,
-                            Secret = "96524ef7-8fea-449c-818c-50a5ab61d5dc",
+                            Secret = "5541c763-f3d9-4d7b-856c-df803d0473b5",
                             UserName = "personel1"
                         });
                 });
@@ -270,7 +278,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 528, DateTimeKind.Unspecified).AddTicks(5550), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Yönetim",
                             IsActive = true
                         },
@@ -278,7 +286,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 528, DateTimeKind.Unspecified).AddTicks(5550), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Operasyon",
                             IsActive = true
                         },
@@ -286,7 +294,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 528, DateTimeKind.Unspecified).AddTicks(5550), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Finans",
                             IsActive = true
                         },
@@ -294,7 +302,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 4L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 528, DateTimeKind.Unspecified).AddTicks(5550), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Yazılım Geliştirme",
                             IsActive = true
                         });
@@ -444,7 +452,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7668), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4311), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Ulaşım biletleri (uçak, tren, taksi vb.)",
                             IsActive = true,
                             Name = "Ulaşım"
@@ -453,7 +461,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7673), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4314), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Yakıt, bakım, otopark, otoyol geçişleri",
                             IsActive = true,
                             Name = "Araç Giderleri"
@@ -462,7 +470,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7674), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4315), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Kişisel yemek harcamaları",
                             IsActive = true,
                             Name = "Yemek"
@@ -471,7 +479,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 4L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7676), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4316), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Otel, konaklama giderleri",
                             IsActive = true,
                             Name = "Konaklama"
@@ -480,7 +488,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 5L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7677), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4317), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "İlaç, hastane, tedavi vs.",
                             IsActive = true,
                             Name = "Sağlık Harcamaları"
@@ -489,7 +497,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 6L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7678), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4319), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Eğitim programları, sertifika ücretleri",
                             IsActive = true,
                             Name = "Eğitim ve Sertifikalar"
@@ -498,7 +506,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 7L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7679), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4320), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "GSM faturaları, internet",
                             IsActive = true,
                             Name = "Telekomünikasyon"
@@ -507,7 +515,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 8L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7681), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4321), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Ofis ekipmanları, kırtasiye",
                             IsActive = true,
                             Name = "Ofis ve Kırtasiye Giderleri"
@@ -516,7 +524,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 9L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7682), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 175, DateTimeKind.Unspecified).AddTicks(4322), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Müşteri ağırlama, toplantı ikramları",
                             IsActive = true,
                             Name = "Ağırlama ve İkram"
@@ -545,11 +553,6 @@ namespace Base.Persistence.Migrations
 
                     b.Property<long>("DepartmentId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -600,9 +603,8 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 531, DateTimeKind.Unspecified).AddTicks(7503), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 1L,
-                            Email = "admin@papara.com",
                             FirstName = "Papara",
                             IBAN = "TR000000000000000000000000",
                             IdentityNumber = "23456789012",
@@ -614,9 +616,8 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 531, DateTimeKind.Unspecified).AddTicks(7503), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 4L,
-                            Email = "ozlem.kalemci@papara.com",
                             FirstName = "Özlem",
                             IBAN = "TR000000000000000000000001",
                             IdentityNumber = "12345678901",
@@ -628,9 +629,8 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 531, DateTimeKind.Unspecified).AddTicks(7503), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 2L,
-                            Email = "personel@papara.com",
                             FirstName = "Personel",
                             IBAN = "TR000000000000000000000002",
                             IdentityNumber = "34567890123",
@@ -699,7 +699,7 @@ namespace Base.Persistence.Migrations
                             Id = 1L,
                             City = "Eskişehir",
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 99, DateTimeKind.Unspecified).AddTicks(5718), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 530, DateTimeKind.Unspecified).AddTicks(8140), new TimeSpan(0, 0, 0, 0, 0)),
                             Detail = "Çamlıca mahallesi Figen sokak civarı",
                             District = "Tepebaşı",
                             EmployeeId = 2L,
@@ -710,7 +710,7 @@ namespace Base.Persistence.Migrations
                             Id = 2L,
                             City = "İstanbul",
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 99, DateTimeKind.Unspecified).AddTicks(5718), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 530, DateTimeKind.Unspecified).AddTicks(8140), new TimeSpan(0, 0, 0, 0, 0)),
                             Detail = "Bahariye Caddesi",
                             District = "Kadıköy",
                             EmployeeId = 3L,
@@ -772,7 +772,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 101, DateTimeKind.Unspecified).AddTicks(2444), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 532, DateTimeKind.Unspecified).AddTicks(1395), new TimeSpan(0, 0, 0, 0, 0)),
                             EmployeeId = 2L,
                             IsActive = true,
                             IsPrimary = true,
@@ -783,7 +783,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 101, DateTimeKind.Unspecified).AddTicks(2444), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 26, 9, 19, 46, 532, DateTimeKind.Unspecified).AddTicks(1395), new TimeSpan(0, 0, 0, 0, 0)),
                             EmployeeId = 3L,
                             IsActive = true,
                             IsPrimary = true,

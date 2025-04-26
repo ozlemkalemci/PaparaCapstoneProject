@@ -8,7 +8,7 @@ using Papara.Application.Features.Corporation.Departments.Queries.Get;
 using Papara.Application.Features.Corporation.Departments.Queries.GetAll;
 using Papara.WebApi.Controllers.Base;
 
-namespace Papara.WebApi.Controllers.Papara;
+namespace Papara.WebApi.Controllers.Papara.Corporation;
 
 [ApiController]
 [Route("api/Departments")]

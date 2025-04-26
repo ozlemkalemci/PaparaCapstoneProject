@@ -15,5 +15,9 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 
 		RuleFor(x => x.Request.Role)
 			.NotNull().WithMessage("Geçersiz rol.");
+
+		RuleFor(x => x.Request.Email)
+			.NotEmpty().WithMessage("E-posta boş olamaz.")
+			.EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
 	}
 }

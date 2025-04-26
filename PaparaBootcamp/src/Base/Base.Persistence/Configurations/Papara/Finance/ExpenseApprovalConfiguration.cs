@@ -21,10 +21,10 @@ namespace Base.Persistence.Configurations.Papara.Finance
 				.HasMaxLength(500);
 
 			builder.Property(x => x.ApprovedById)
-				.IsRequired();
+				.IsRequired(false);
 
 			builder.Property(x => x.ApprovedDate)
-				.IsRequired();
+				.IsRequired(false);
 		}
 	}
 }
