@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.Finance.Expenses.Converters;
@@ -22,14 +23,13 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
 	public async Task<ExpenseResponse> Handle(CreateExpenseCommand request, CancellationToken cancellationToken)
 	{
 		var dto = request.Request;
-		var currentUserId = _userContextService.GetCurrentUserId();
+
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
 		if (currentUserRole == "Employee")
 		{
-			dto.EmployeeId = currentUserId ?? throw new UnauthorizedAccessException("Kullanıcı bilgisi bulunamadı.");
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, dto.EmployeeId);
 		}
-
 
 		using var transaction = _unitOfWork.BeginTransaction();
 

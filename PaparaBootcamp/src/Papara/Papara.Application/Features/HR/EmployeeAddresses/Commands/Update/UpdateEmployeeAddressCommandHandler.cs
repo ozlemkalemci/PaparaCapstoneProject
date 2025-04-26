@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.HR.EmployeeAddresses.Converters;
@@ -24,11 +25,12 @@ public class UpdateEmployeeAddressCommandHandler : IRequestHandler<UpdateEmploye
 		if (entity == null)
 			throw new KeyNotFoundException("Adres bulunamadı.");
 
-		var currentUserId = _userContextService.GetCurrentUserId();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
-		if (currentUserRole == "Employee" && entity.EmployeeId != currentUserId)
-			throw new UnauthorizedAccessException("Bu adrese erişiminiz yok.");
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 
 		var dto = request.Request;
 

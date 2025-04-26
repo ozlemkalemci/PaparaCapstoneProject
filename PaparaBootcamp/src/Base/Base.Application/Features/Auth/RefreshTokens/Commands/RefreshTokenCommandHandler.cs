@@ -60,7 +60,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
 		// Yeni access token üret
 		var user = (await _unitOfWork.Repository<User>().GetByIdAsync(matched.UserId))!;
-		var accessToken = _jwtService.GenerateToken(user);
+		var accessToken = await _jwtService.GenerateToken(user);
 
 		return new RefreshTokenResponse
 		{

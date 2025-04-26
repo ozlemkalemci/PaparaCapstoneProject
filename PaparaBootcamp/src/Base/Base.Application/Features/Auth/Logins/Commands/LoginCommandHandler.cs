@@ -1,4 +1,5 @@
-﻿using Base.Application.Features.Auth.Logins.Models;
+﻿using Base.Application.Common.Exceptions;
+using Base.Application.Features.Auth.Logins.Models;
 using Base.Application.Interfaces;
 using Base.Domain.Identity;
 using Base.Domain.Interfaces;
@@ -39,10 +40,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
 
 		if (user == null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
 		{
-			throw new UnauthorizedAccessException("Kullanıcı adı veya şifre hatalı.");
+			throw new InvalidCredentialsException();
 		}
 
-		var token = _jwtService.GenerateToken(user);
+		var token = await _jwtService.GenerateToken(user);
 
 		// Kullanıcının aktif refresh token'ını sil
 		var activeTokens = await _unitOfWork.Repository<RefreshToken>()

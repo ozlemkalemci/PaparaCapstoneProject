@@ -1,12 +1,11 @@
 ﻿using Base.Application.Common.Extensions;
+using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
-using System.Linq.Expressions;
 using Papara.Application.Features.Finance.Expenses.Converters;
 using Papara.Application.Features.Finance.Expenses.Models;
-using Papara.Domain.Entities.Finance;
-using Base.Application.Interfaces;
-using Base.Domain.Enums;
+using System.Linq.Expressions;
 
 namespace Papara.Application.Features.Finance.Expenses.Queries.GetAll;
 
@@ -24,35 +23,28 @@ public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, L
 	{
 		var filter = (Expression<Func<Expense, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Expense, object>>>();
-
-		var currentUserId = _userContextService.GetCurrentUserId();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
-		if (currentUserId > 0 && currentUserRole == UserRole.Employee.GetDisplayName())
+		if ((request.Request.EmployeeId == null || request.Request.EmployeeId == 0) && currentUserRole == "Employee")
 		{
-			// Eğer Personel başka birinin EmployeeId'sini göndermeye çalışıyorsa izin verme
-			if (request.Request.EmployeeId.HasValue && request.Request.EmployeeId != currentUserId)
-				throw new UnauthorizedAccessException("Başka bir çalışanın masraf kayıtlarına erişemezsiniz.");
-
-			// Personel sadece kendi masraflarını görebilir
-			filter = filter.And(x => x.EmployeeId == currentUserId);
+			filter = filter.And(x => x.EmployeeId == _userContextService.GetCurrentEmployeeId());
 		}
-
-		if (request.Request.EmployeeId.HasValue)
+		if (request.Request.EmployeeId > 0 && currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, request.Request.EmployeeId.Value);
+		}
+		if (request.Request.EmployeeId > 0)
 		{
 			filter = filter.And(x => x.EmployeeId == request.Request.EmployeeId);
 		}
-
 		if (request.Request.ExpenseTypeId.HasValue)
 		{
 			filter = filter.And(x => x.ExpenseTypeId == request.Request.ExpenseTypeId);
 		}
-
 		if (request.Request.IncludeEmployee)
 		{
 			includes.Add(x => x.Employee);
 		}
-
 		if (request.Request.IncludeExpenseType)
 		{
 			includes.Add(x => x.ExpenseType);

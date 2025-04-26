@@ -3,5 +3,6 @@
 public interface IUserContextService
 {
 	long? GetCurrentUserId();
+	long? GetCurrentEmployeeId();
 	string? GetCurrentUserRole();
 }

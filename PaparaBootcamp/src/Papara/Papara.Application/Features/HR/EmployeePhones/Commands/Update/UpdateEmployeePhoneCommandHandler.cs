@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.HR.EmployeePhones.Converters;
@@ -23,7 +24,12 @@ public class UpdateEmployeePhoneCommandHandler : IRequestHandler<UpdateEmployeeP
 		var entity = await _unitOfWork.Repository<EmployeePhone>().GetByIdAsync(request.Id);
 		if (entity == null)
 			throw new KeyNotFoundException("Telefon bulunamadı.");
+		var currentUserRole = _userContextService.GetCurrentUserRole();
 
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.EmployeeId);
+		}
 		var dto = request.Request;
 
 		entity.PhoneNumber = dto.PhoneNumber;

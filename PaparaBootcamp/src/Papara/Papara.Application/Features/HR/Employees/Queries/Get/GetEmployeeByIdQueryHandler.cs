@@ -1,4 +1,5 @@
-﻿using Base.Application.Interfaces;
+﻿using Base.Application.Common.Helpers;
+using Base.Application.Interfaces;
 using Base.Domain.Interfaces;
 using MediatR;
 using Papara.Application.Features.HR.Employees.Converters;
@@ -20,18 +21,17 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
 
 	public async Task<EmployeeResponse> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
 	{
-		var employee = await _unitOfWork.Repository<Employee>().GetByIdAsync(request.Id);
+		var entity = await _unitOfWork.Repository<Employee>().GetByIdAsync(request.Id);
 
-		if (employee == null)
+		if (entity == null)
 			throw new KeyNotFoundException("Çalışan bulunamadı.");
 
-		var currentUserId = _userContextService.GetCurrentUserId();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
-		// Eğer employee ise sadece kendi kaydına erişebilir
-		if (currentUserRole == "Employee" && employee.Id != currentUserId)
-			throw new UnauthorizedAccessException("Sadece kendi bilgilerinizi görüntüleyebilirsiniz.");
-
-		return EmployeeConverters.EmployeeConverter(employee);
+		if (currentUserRole == "Employee")
+		{
+			AuthorizationHelper.EnsureEmployeeOwnsData(_userContextService, entity.Id);
+		}
+		return EmployeeConverters.EmployeeConverter(entity);
 	}
 }
