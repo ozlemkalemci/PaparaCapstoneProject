@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Papara.WebApi.Controllers.Base;
 using Papara.Application.Features.HR.EmployeePhones.Models;
 
-namespace Papara.WebApi.Controllers.Papara;
+namespace Papara.WebApi.Controllers.Papara.HR;
 
 [ApiController]
 [Route("api/employeephones")]

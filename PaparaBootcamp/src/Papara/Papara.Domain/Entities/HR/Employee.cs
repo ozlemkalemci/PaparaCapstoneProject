@@ -6,7 +6,6 @@ namespace Papara.Domain.Entities.HR;
 
 public class Employee : BaseEntity
 {
-	public string Email { get; set; } = null!;
 	public string FirstName { get; set; } = null!;
 	public string? MiddleName { get; set; }
 	public string LastName { get; set; } = null!;

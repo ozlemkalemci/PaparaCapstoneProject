@@ -10,7 +10,7 @@ using Papara.WebApi.Controllers.Base;
 using System.Security.Claims;
 using Papara.Application.Features.HR.Employees.Models;
 
-namespace Papara.WebApi.Controllers.Papara;
+namespace Papara.WebApi.Controllers.Papara.HR;
 
 [ApiController]
 [Route("api/employees")]
@@ -35,12 +35,6 @@ public class EmployeesController : ApiControllerBase
 	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetById(long id)
 	{
-		var currentUserId = _userContextService.GetCurrentUserId();
-		var currentUserRole = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
-
-		if (currentUserRole == "Employee" && id != currentUserId)
-			return Forbid();
-
 		var result = await Mediator.Send(new GetEmployeeByIdQuery(id));
 		return Ok(result);
 	}

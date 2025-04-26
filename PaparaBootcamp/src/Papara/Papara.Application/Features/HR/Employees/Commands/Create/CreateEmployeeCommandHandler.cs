@@ -29,7 +29,6 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 
 		var entity = new Employee
 		{
-			Email = dto.Email,
 			FirstName = dto.FirstName,
 			MiddleName = dto.MiddleName,
 			LastName = dto.LastName,

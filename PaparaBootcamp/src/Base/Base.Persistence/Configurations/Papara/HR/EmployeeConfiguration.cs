@@ -13,10 +13,6 @@ public class EmployeeConfiguration : BaseEntityConfiguration<Employee>
 
 		base.Configure(builder);
 
-		builder.Property(e => e.Email)
-			.IsRequired()
-			.HasMaxLength(150);
-
 		builder.Property(e => e.FirstName)
 			.IsRequired()
 			.HasMaxLength(100);
@@ -66,7 +62,6 @@ public class EmployeeConfiguration : BaseEntityConfiguration<Employee>
 			{
 				Id = 1,
 				UserId = 1, // admin
-				Email = "admin@papara.com",
 				FirstName = "Papara",
 				MiddleName = null,
 				LastName = "Admin",
@@ -81,7 +76,6 @@ public class EmployeeConfiguration : BaseEntityConfiguration<Employee>
 			{
 				Id = 2,
 				UserId = 2, // özlem.kalemci
-				Email = "ozlem.kalemci@papara.com",
 				FirstName = "Özlem",
 				MiddleName = null,
 				LastName = "Kalemci",
@@ -96,7 +90,6 @@ public class EmployeeConfiguration : BaseEntityConfiguration<Employee>
 			{
 				Id = 3,
 				UserId = 3, // personel
-				Email = "personel@papara.com",
 				FirstName = "Personel",
 				MiddleName = null,
 				LastName = "Personel",

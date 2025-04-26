@@ -9,7 +9,7 @@ using Papara.WebApi.Controllers.Base;
 using System.Security.Claims;
 using Papara.Application.Features.HR.EmployeeAddresses.Models;
 
-namespace Papara.WebApi.Controllers.Papara;
+namespace Papara.WebApi.Controllers.Papara.HR;
 
 [ApiController]
 [Route("api/employeeaddresses")]

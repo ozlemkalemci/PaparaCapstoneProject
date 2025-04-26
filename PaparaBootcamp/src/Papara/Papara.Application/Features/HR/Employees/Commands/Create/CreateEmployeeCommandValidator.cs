@@ -11,10 +11,6 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
 {
 	public CreateEmployeeCommandValidator()
 	{
-		RuleFor(x => x.Request.Email)
-			.NotEmpty().WithMessage("E-posta boş olamaz.")
-			.EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
-
 		RuleFor(x => x.Request.FirstName)
 			.NotEmpty().WithMessage("Ad boş olamaz.");
 
