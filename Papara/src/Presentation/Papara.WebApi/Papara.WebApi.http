@@ -1,6 +1,0 @@
-@Papara.WebApi_HostAddress = http://localhost:5125
-
-GET {{Papara.WebApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
