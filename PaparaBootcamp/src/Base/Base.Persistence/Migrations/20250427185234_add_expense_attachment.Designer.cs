@@ -4,6 +4,7 @@ using Base.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Base.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427185234_add_expense_attachment")]
+    partial class add_expense_attachment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,39 +146,39 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "admin@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$8BXUb7RbhA6JTCWIVJGnoeI09O6OcZox2KICDPy8bYhzW5Mf1CnNq",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$GUaDs7hPEph1NKYWkcNH1elBXqZfK2mEVRTvj9dKF7rjmRUYftfOG",
                             Role = (byte)1,
-                            Secret = "ae6daa72-6a47-400c-a73c-9f71b9aac582",
+                            Secret = "b537b8c5-c470-4698-aca5-55726a374ea9",
                             UserName = "admin"
                         },
                         new
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "ozlem.kalemci@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$9yc/nf9C.unoN39Ku4J8O.xdKj2k7CWwHNjjqhkDca9IYZVe2enCa",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$./rVjFFFMcUI9lHeozG2nOjzzdxcJUQCzMl8vNS6wdgVshEQ4gdFS",
                             Role = (byte)2,
-                            Secret = "720db2de-39f1-4e21-9d07-0c1cb07970ab",
+                            Secret = "d9589856-1cce-4586-ae87-371a26078fef",
                             UserName = "ozlem.kalemci"
                         },
                         new
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "personel@papara.com",
                             IsActive = true,
-                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(9228), new TimeSpan(0, 0, 0, 0, 0)),
-                            PasswordHash = "$2a$11$/5o6Ll18v3HHrZhEJxTtP.4yntfFh3xbD.bm64J26dk8ZLFbUiY42",
+                            OpenDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 920, DateTimeKind.Unspecified).AddTicks(5198), new TimeSpan(0, 0, 0, 0, 0)),
+                            PasswordHash = "$2a$11$ChwCbOFUwHtj0PxYUG3qq.CL/Ph7r/TuPr0O9qExoeMPU2aRgNfAG",
                             Role = (byte)2,
-                            Secret = "4628f07a-a363-4115-ac03-2471a3017690",
+                            Secret = "9e292d48-f5f4-4441-91e1-273618cc36fa",
                             UserName = "personel1"
                         });
                 });
@@ -235,72 +238,6 @@ namespace Base.Persistence.Migrations
                     b.ToTable("Expenses", "Finance");
                 });
 
-            modelBuilder.Entity("ExpenseAttachment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long>("CreatedById")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<long?>("DeletedById")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset?>("DeletedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<long>("ExpenseId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OriginalFileName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("StoredFileName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<long?>("UpdatedById")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset?>("UpdatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExpenseId");
-
-                    b.ToTable("ExpenseAttachments", "Finance");
-                });
-
             modelBuilder.Entity("Papara.Domain.Entities.Corporation.Department", b =>
                 {
                     b.Property<long>("Id")
@@ -344,7 +281,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 346, DateTimeKind.Unspecified).AddTicks(7607), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 244, DateTimeKind.Unspecified).AddTicks(4114), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Yönetim",
                             IsActive = true
                         },
@@ -352,7 +289,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 346, DateTimeKind.Unspecified).AddTicks(7607), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 244, DateTimeKind.Unspecified).AddTicks(4114), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Operasyon",
                             IsActive = true
                         },
@@ -360,7 +297,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 346, DateTimeKind.Unspecified).AddTicks(7607), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 244, DateTimeKind.Unspecified).AddTicks(4114), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Finans",
                             IsActive = true
                         },
@@ -368,7 +305,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 4L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 346, DateTimeKind.Unspecified).AddTicks(7607), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 244, DateTimeKind.Unspecified).AddTicks(4114), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentName = "Yazılım Geliştirme",
                             IsActive = true
                         });
@@ -426,6 +363,57 @@ namespace Base.Persistence.Migrations
                     b.ToTable("ExpenseApprovals", "Finance");
                 });
 
+            modelBuilder.Entity("Papara.Domain.Entities.Finance.ExpenseAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CreatedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long?>("DeletedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ExpenseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("UpdatedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseId");
+
+                    b.ToTable("ExpenseAttachments", "Finance");
+                });
+
             modelBuilder.Entity("Papara.Domain.Entities.Finance.ExpenseType", b =>
                 {
                     b.Property<long>("Id")
@@ -474,7 +462,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2230), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8239), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Ulaşım biletleri (uçak, tren, taksi vb.)",
                             IsActive = true,
                             Name = "Ulaşım"
@@ -483,7 +471,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2232), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8242), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Yakıt, bakım, otopark, otoyol geçişleri",
                             IsActive = true,
                             Name = "Araç Giderleri"
@@ -492,7 +480,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2234), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8243), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Kişisel yemek harcamaları",
                             IsActive = true,
                             Name = "Yemek"
@@ -501,7 +489,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 4L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2235), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8245), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Otel, konaklama giderleri",
                             IsActive = true,
                             Name = "Konaklama"
@@ -510,7 +498,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 5L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2237), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8246), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "İlaç, hastane, tedavi vs.",
                             IsActive = true,
                             Name = "Sağlık Harcamaları"
@@ -519,7 +507,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 6L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2238), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8247), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Eğitim programları, sertifika ücretleri",
                             IsActive = true,
                             Name = "Eğitim ve Sertifikalar"
@@ -528,7 +516,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 7L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2239), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8296), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "GSM faturaları, internet",
                             IsActive = true,
                             Name = "Telekomünikasyon"
@@ -537,7 +525,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 8L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2240), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8297), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Ofis ekipmanları, kırtasiye",
                             IsActive = true,
                             Name = "Ofis ve Kırtasiye Giderleri"
@@ -546,7 +534,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 9L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 21, DateTimeKind.Unspecified).AddTicks(2241), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 33, 919, DateTimeKind.Unspecified).AddTicks(8298), new TimeSpan(0, 0, 0, 0, 0)),
                             Description = "Müşteri ağırlama, toplantı ikramları",
                             IsActive = true,
                             Name = "Ağırlama ve İkram"
@@ -625,7 +613,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 349, DateTimeKind.Unspecified).AddTicks(5572), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 247, DateTimeKind.Unspecified).AddTicks(9402), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 1L,
                             FirstName = "Papara",
                             IBAN = "TR000000000000000000000000",
@@ -638,7 +626,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 349, DateTimeKind.Unspecified).AddTicks(5572), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 247, DateTimeKind.Unspecified).AddTicks(9402), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 4L,
                             FirstName = "Özlem",
                             IBAN = "TR000000000000000000000001",
@@ -651,7 +639,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 3L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 349, DateTimeKind.Unspecified).AddTicks(5572), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 247, DateTimeKind.Unspecified).AddTicks(9402), new TimeSpan(0, 0, 0, 0, 0)),
                             DepartmentId = 2L,
                             FirstName = "Personel",
                             IBAN = "TR000000000000000000000002",
@@ -721,7 +709,7 @@ namespace Base.Persistence.Migrations
                             Id = 1L,
                             City = "Eskişehir",
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 348, DateTimeKind.Unspecified).AddTicks(7060), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 246, DateTimeKind.Unspecified).AddTicks(9837), new TimeSpan(0, 0, 0, 0, 0)),
                             Detail = "Çamlıca mahallesi Figen sokak civarı",
                             District = "Tepebaşı",
                             EmployeeId = 2L,
@@ -732,7 +720,7 @@ namespace Base.Persistence.Migrations
                             Id = 2L,
                             City = "İstanbul",
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 348, DateTimeKind.Unspecified).AddTicks(7060), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 246, DateTimeKind.Unspecified).AddTicks(9837), new TimeSpan(0, 0, 0, 0, 0)),
                             Detail = "Bahariye Caddesi",
                             District = "Kadıköy",
                             EmployeeId = 3L,
@@ -794,7 +782,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 1L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 349, DateTimeKind.Unspecified).AddTicks(9068), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 248, DateTimeKind.Unspecified).AddTicks(3310), new TimeSpan(0, 0, 0, 0, 0)),
                             EmployeeId = 2L,
                             IsActive = true,
                             IsPrimary = true,
@@ -805,7 +793,7 @@ namespace Base.Persistence.Migrations
                         {
                             Id = 2L,
                             CreatedById = 0L,
-                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 19, 5, 54, 349, DateTimeKind.Unspecified).AddTicks(9068), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedDate = new DateTimeOffset(new DateTime(2025, 4, 27, 18, 52, 34, 248, DateTimeKind.Unspecified).AddTicks(3310), new TimeSpan(0, 0, 0, 0, 0)),
                             EmployeeId = 3L,
                             IsActive = true,
                             IsPrimary = true,
@@ -844,10 +832,10 @@ namespace Base.Persistence.Migrations
                     b.Navigation("ExpenseType");
                 });
 
-            modelBuilder.Entity("ExpenseAttachment", b =>
+            modelBuilder.Entity("Papara.Domain.Entities.Finance.ExpenseApproval", b =>
                 {
                     b.HasOne("Expense", "Expense")
-                        .WithMany("Attachments")
+                        .WithMany("Approvals")
                         .HasForeignKey("ExpenseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -855,10 +843,10 @@ namespace Base.Persistence.Migrations
                     b.Navigation("Expense");
                 });
 
-            modelBuilder.Entity("Papara.Domain.Entities.Finance.ExpenseApproval", b =>
+            modelBuilder.Entity("Papara.Domain.Entities.Finance.ExpenseAttachment", b =>
                 {
                     b.HasOne("Expense", "Expense")
-                        .WithMany("Approvals")
+                        .WithMany("Attachments")
                         .HasForeignKey("ExpenseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
