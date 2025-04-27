@@ -1,6 +1,7 @@
 ﻿using Base.Application.Interfaces;
 using Base.Infrastructure.Services;
 using Base.Infrastructure.Services.Auth;
+using Base.Infrastructure.Services.File;
 using Base.Infrastructure.Services.Redis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,8 @@ public static class ConfigureServices
 		services.AddSingleton<IConnectionMultiplexer>(
 			_ => ConnectionMultiplexer.Connect("localhost:6379"));
 		services.AddScoped<IRedisService, RedisService>();
+
+		services.AddScoped<IFileService, LocalFileService>();
 
 		return services;
 	}

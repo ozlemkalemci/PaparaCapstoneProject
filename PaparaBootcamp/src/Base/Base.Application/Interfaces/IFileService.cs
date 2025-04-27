@@ -4,6 +4,7 @@ namespace Base.Application.Interfaces;
 
 public interface IFileService
 {
-	Task<string> UploadFileAsync(IFormFile file, string folderPath);
-	Task DeleteFileAsync(string filePath);
+	Task<string> UploadAsync(IFormFile file, string directory = "");
+	Task<byte[]> DownloadAsync(string filePath);
+	Task DeleteAsync(string filePath);
 }
