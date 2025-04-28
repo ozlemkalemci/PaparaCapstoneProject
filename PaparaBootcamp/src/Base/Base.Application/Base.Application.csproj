@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Base.Domain\Base.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Auth\RefreshTokens\Validators\" />
-  </ItemGroup>
-
 </Project>
