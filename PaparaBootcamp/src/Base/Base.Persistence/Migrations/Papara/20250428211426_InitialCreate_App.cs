@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Base.Persistence.Migrations
+namespace Base.Persistence.Migrations.Papara
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreate_App : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,29 @@ namespace Base.Persistence.Migrations
 
             migrationBuilder.EnsureSchema(
                 name: "Base");
+
+            migrationBuilder.CreateTable(
+                name: "Companies",
+                schema: "Corporation",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CompanyName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    TaxNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    CompanyIBAN = table.Column<string>(type: "nvarchar(34)", maxLength: 34, nullable: false),
+                    CreatedById = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedById = table.Column<long>(type: "bigint", nullable: true),
+                    UpdatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedById = table.Column<long>(type: "bigint", nullable: true),
+                    DeletedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Companies", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Departments",
@@ -77,6 +100,7 @@ namespace Base.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Secret = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Role = table.Column<byte>(type: "tinyint", nullable: false),
                     OpenDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -101,7 +125,6 @@ namespace Base.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -278,8 +301,8 @@ namespace Base.Persistence.Migrations
                     ExpenseId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<byte>(type: "tinyint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ApprovedById = table.Column<long>(type: "bigint", nullable: false),
-                    ApprovedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ApprovedById = table.Column<long>(type: "bigint", nullable: true),
+                    ApprovedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CreatedById = table.Column<long>(type: "bigint", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UpdatedById = table.Column<long>(type: "bigint", nullable: true),
@@ -308,7 +331,12 @@ namespace Base.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ExpenseId = table.Column<long>(type: "bigint", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    OriginalFileName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    StoredFileName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     CreatedById = table.Column<long>(type: "bigint", nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UpdatedById = table.Column<long>(type: "bigint", nullable: true),
@@ -331,14 +359,20 @@ namespace Base.Persistence.Migrations
 
             migrationBuilder.InsertData(
                 schema: "Corporation",
+                table: "Companies",
+                columns: new[] { "Id", "CompanyIBAN", "CompanyName", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "IsActive", "TaxNumber", "UpdatedById", "UpdatedDate" },
+                values: new object[] { 1L, "TR000000000000000000000999", "Papara Şirketi", 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 20, DateTimeKind.Unspecified).AddTicks(5052), new TimeSpan(0, 0, 0, 0, 0)), null, null, true, "1234567890", null, null });
+
+            migrationBuilder.InsertData(
+                schema: "Corporation",
                 table: "Departments",
                 columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "DepartmentName", "IsActive", "UpdatedById", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yönetim", true, null, null },
-                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Operasyon", true, null, null },
-                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Finans", true, null, null },
-                    { 4L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 96, DateTimeKind.Unspecified).AddTicks(8843), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yazılım Geliştirme", true, null, null }
+                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 20, DateTimeKind.Unspecified).AddTicks(8576), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yönetim", true, null, null },
+                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 20, DateTimeKind.Unspecified).AddTicks(8576), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Operasyon", true, null, null },
+                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 20, DateTimeKind.Unspecified).AddTicks(8576), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Finans", true, null, null },
+                    { 4L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 20, DateTimeKind.Unspecified).AddTicks(8576), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yazılım Geliştirme", true, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -347,37 +381,37 @@ namespace Base.Persistence.Migrations
                 columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "Description", "IsActive", "Name", "UpdatedById", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7668), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Ulaşım biletleri (uçak, tren, taksi vb.)", true, "Ulaşım", null, null },
-                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7673), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yakıt, bakım, otopark, otoyol geçişleri", true, "Araç Giderleri", null, null },
-                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7674), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Kişisel yemek harcamaları", true, "Yemek", null, null },
-                    { 4L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7676), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Otel, konaklama giderleri", true, "Konaklama", null, null },
-                    { 5L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7677), new TimeSpan(0, 0, 0, 0, 0)), null, null, "İlaç, hastane, tedavi vs.", true, "Sağlık Harcamaları", null, null },
-                    { 6L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7678), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Eğitim programları, sertifika ücretleri", true, "Eğitim ve Sertifikalar", null, null },
-                    { 7L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7679), new TimeSpan(0, 0, 0, 0, 0)), null, null, "GSM faturaları, internet", true, "Telekomünikasyon", null, null },
-                    { 8L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7681), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Ofis ekipmanları, kırtasiye", true, "Ofis ve Kırtasiye Giderleri", null, null },
-                    { 9L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 703, DateTimeKind.Unspecified).AddTicks(7682), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Müşteri ağırlama, toplantı ikramları", true, "Ağırlama ve İkram", null, null }
+                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5381), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Ulaşım biletleri (uçak, tren, taksi vb.)", true, "Ulaşım", null, null },
+                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5384), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Yakıt, bakım, otopark, otoyol geçişleri", true, "Araç Giderleri", null, null },
+                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5385), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Kişisel yemek harcamaları", true, "Yemek", null, null },
+                    { 4L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5387), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Otel, konaklama giderleri", true, "Konaklama", null, null },
+                    { 5L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5388), new TimeSpan(0, 0, 0, 0, 0)), null, null, "İlaç, hastane, tedavi vs.", true, "Sağlık Harcamaları", null, null },
+                    { 6L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5389), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Eğitim programları, sertifika ücretleri", true, "Eğitim ve Sertifikalar", null, null },
+                    { 7L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5390), new TimeSpan(0, 0, 0, 0, 0)), null, null, "GSM faturaları, internet", true, "Telekomünikasyon", null, null },
+                    { 8L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5391), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Ofis ekipmanları, kırtasiye", true, "Ofis ve Kırtasiye Giderleri", null, null },
+                    { 9L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 654, DateTimeKind.Unspecified).AddTicks(5392), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Müşteri ağırlama, toplantı ikramları", true, "Ağırlama ve İkram", null, null }
                 });
 
             migrationBuilder.InsertData(
                 schema: "Base",
                 table: "Users",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "IsActive", "LastLoginDate", "OpenDate", "PasswordHash", "Role", "Secret", "UpdatedById", "UpdatedDate", "UserName" },
+                columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "Email", "IsActive", "LastLoginDate", "OpenDate", "PasswordHash", "Role", "Secret", "UpdatedById", "UpdatedDate", "UserName" },
                 values: new object[,]
                 {
-                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), null, null, true, null, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$.7sdAy6qoezVF3TzizPNleMpeXRCuiF/4wuiLWnYyIisteft7RL4y", (byte)1, "6ba07f5f-73f1-4cf8-8422-10aa82d178d6", null, null, "admin" },
-                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), null, null, true, null, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$QR4bxK13LlJnVsXw91iESe1Z2h.n.XeyMIxnreyvwGfMtucRKrwzC", (byte)2, "2b3e55ab-f2be-45c5-a4db-b58c854a4f67", null, null, "ozlem.kalemci" },
-                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), null, null, true, null, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 26, 704, DateTimeKind.Unspecified).AddTicks(9010), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$LE.Gsd.uCbqEZy3SgmSL4OMGexHJtJVIQuC0HKRnMiIG7NA334iEC", (byte)2, "96524ef7-8fea-449c-818c-50a5ab61d5dc", null, null, "personel1" }
+                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), null, null, "admin@papara.com", true, null, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$jAtiDpJSiBwBboPwrI8n9.uDldI.jW77aq9MaSwZVb0Odd6vKKO7G", (byte)1, "a1f91392-0470-4487-affa-6528d19818ba", null, null, "admin" },
+                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), null, null, "ozlem.kalemci@papara.com", true, null, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$YHVG/PhIa1vHV9QD5wqqt.ZgMSnsZJToLiExodghzwGABil49lFKi", (byte)2, "8197572f-2184-41ee-b5b3-f6c7f16a74d6", null, null, "ozlem.kalemci" },
+                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), null, null, "personel@papara.com", true, null, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 25, 655, DateTimeKind.Unspecified).AddTicks(3055), new TimeSpan(0, 0, 0, 0, 0)), "$2a$11$jY3nIcvSigoZgON3gj43YurWDScDUzSj2g6CuiEmsYryaow7JZlGG", (byte)2, "f0abaffd-d7eb-456d-9e3b-a23f3bf360d0", null, null, "personel1" }
                 });
 
             migrationBuilder.InsertData(
                 schema: "HR",
                 table: "Employees",
-                columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "DepartmentId", "Email", "FirstName", "IBAN", "IdentityNumber", "IsActive", "LastName", "MiddleName", "UpdatedById", "UpdatedDate", "UserId" },
+                columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "DepartmentId", "FirstName", "IBAN", "IdentityNumber", "IsActive", "LastName", "MiddleName", "UpdatedById", "UpdatedDate", "UserId" },
                 values: new object[,]
                 {
-                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)), null, null, 1L, "admin@papara.com", "Papara", "TR000000000000000000000000", "23456789012", true, "Admin", null, null, null, 1L },
-                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)), null, null, 4L, "ozlem.kalemci@papara.com", "Özlem", "TR000000000000000000000001", "12345678901", true, "Kalemci", null, null, null, 2L },
-                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 100, DateTimeKind.Unspecified).AddTicks(7411), new TimeSpan(0, 0, 0, 0, 0)), null, null, 2L, "personel@papara.com", "Personel", "TR000000000000000000000002", "34567890123", true, "Personel", null, null, null, 3L }
+                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 23, DateTimeKind.Unspecified).AddTicks(6062), new TimeSpan(0, 0, 0, 0, 0)), null, null, 1L, "Papara", "TR000000000000000000000000", "23456789012", true, "Admin", null, null, null, 1L },
+                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 23, DateTimeKind.Unspecified).AddTicks(6062), new TimeSpan(0, 0, 0, 0, 0)), null, null, 4L, "Özlem", "TR000000000000000000000001", "12345678901", true, "Kalemci", null, null, null, 2L },
+                    { 3L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 23, DateTimeKind.Unspecified).AddTicks(6062), new TimeSpan(0, 0, 0, 0, 0)), null, null, 2L, "Personel", "TR000000000000000000000002", "34567890123", true, "Personel", null, null, null, 3L }
                 });
 
             migrationBuilder.InsertData(
@@ -386,8 +420,8 @@ namespace Base.Persistence.Migrations
                 columns: new[] { "Id", "City", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "Detail", "District", "EmployeeId", "IsActive", "UpdatedById", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { 1L, "Eskişehir", 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 99, DateTimeKind.Unspecified).AddTicks(5718), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Çamlıca mahallesi Figen sokak civarı", "Tepebaşı", 2L, true, null, null },
-                    { 2L, "İstanbul", 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 99, DateTimeKind.Unspecified).AddTicks(5718), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Bahariye Caddesi", "Kadıköy", 3L, true, null, null }
+                    { 1L, "Eskişehir", 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 22, DateTimeKind.Unspecified).AddTicks(6445), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Çamlıca mahallesi Figen sokak civarı", "Tepebaşı", 2L, true, null, null },
+                    { 2L, "İstanbul", 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 22, DateTimeKind.Unspecified).AddTicks(6445), new TimeSpan(0, 0, 0, 0, 0)), null, null, "Bahariye Caddesi", "Kadıköy", 3L, true, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -396,8 +430,8 @@ namespace Base.Persistence.Migrations
                 columns: new[] { "Id", "CreatedById", "CreatedDate", "DeletedById", "DeletedDate", "EmployeeId", "IsActive", "IsPrimary", "PhoneNumber", "Type", "UpdatedById", "UpdatedDate" },
                 values: new object[,]
                 {
-                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 101, DateTimeKind.Unspecified).AddTicks(2444), new TimeSpan(0, 0, 0, 0, 0)), null, null, 2L, true, true, "5551234567", (byte)1, null, null },
-                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 26, 8, 26, 27, 101, DateTimeKind.Unspecified).AddTicks(2444), new TimeSpan(0, 0, 0, 0, 0)), null, null, 3L, true, true, "2129876543", (byte)3, null, null }
+                    { 1L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 23, DateTimeKind.Unspecified).AddTicks(9965), new TimeSpan(0, 0, 0, 0, 0)), null, null, 2L, true, true, "5551234567", (byte)1, null, null },
+                    { 2L, 0L, new DateTimeOffset(new DateTime(2025, 4, 28, 21, 14, 26, 23, DateTimeKind.Unspecified).AddTicks(9965), new TimeSpan(0, 0, 0, 0, 0)), null, null, 3L, true, true, "2129876543", (byte)3, null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -465,6 +499,10 @@ namespace Base.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Companies",
+                schema: "Corporation");
+
             migrationBuilder.DropTable(
                 name: "EmployeeAddresses",
                 schema: "HR");
