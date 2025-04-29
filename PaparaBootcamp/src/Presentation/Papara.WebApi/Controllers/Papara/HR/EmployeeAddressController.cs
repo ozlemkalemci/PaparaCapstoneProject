@@ -21,7 +21,7 @@ public class EmployeeAddressController : ApiControllerBase
 	}
 
 	[HttpGet]
-	[Authorize(Roles = "Employee")]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetAll([FromQuery] GetEmployeeAddressRequest request)
 	{
 		var result = await Mediator.Send(new GetAllEmployeeAddressesQuery(request));

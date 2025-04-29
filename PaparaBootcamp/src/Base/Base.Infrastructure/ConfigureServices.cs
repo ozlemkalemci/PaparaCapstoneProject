@@ -4,6 +4,7 @@ using Base.Infrastructure.Services.Auth;
 using Base.Infrastructure.Services.File;
 using Base.Infrastructure.Services.Redis;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -22,9 +23,16 @@ public static class ConfigureServices
 		services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 
 		// Redis kayıtları
-		services.AddSingleton<IConnectionMultiplexer>(
-			_ => ConnectionMultiplexer.Connect("localhost:6379"));
-		services.AddScoped<IRedisService, RedisService>();
+		//services.AddSingleton<IConnectionMultiplexer>(
+		//	_ => ConnectionMultiplexer.Connect("localhost:6379"));
+		//services.AddScoped<IRedisService, RedisService>();
+
+		services.AddSingleton<IConnectionMultiplexer>(provider =>
+		{
+			var configuration = provider.GetRequiredService<IConfiguration>();
+			var redisConnectionString = configuration.GetValue<string>("RedisConnection");
+			return ConnectionMultiplexer.Connect(redisConnectionString);
+		});
 
 		services.AddScoped<IFileService, LocalFileService>();
 
