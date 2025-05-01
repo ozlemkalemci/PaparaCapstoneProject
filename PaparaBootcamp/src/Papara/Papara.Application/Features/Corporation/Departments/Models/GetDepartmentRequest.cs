@@ -2,5 +2,5 @@
 
 public class GetDepartmentRequest
 {
-	public string? DepartmentName { get; set; } = null!;
+	public string? DepartmentName { get; set; } = null;
 }
