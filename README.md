@@ -146,5 +146,7 @@ dotnet run
 ## 👨‍💻 Geliştirici Bilgisi
 
 > Geliştirici: Özlem Kalemci
-> Proje: Papara Expense Management  
+
+> Proje: Papara Expense Management
+
 > Tarih: Mayıs 2025
