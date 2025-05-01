@@ -67,10 +67,6 @@ Authorization: Bearer {{bearerToken}}
 
 ### 1️⃣ Bağımlılıklar
 
-> Redis çalışır durumda olmalıdır:
-
----
-
 ## ⚙️ appsettings.json Yapılandırması
 
 ```json
@@ -93,7 +89,7 @@ Authorization: Bearer {{bearerToken}}
 }
 ```
 
-> 🔔 **Not:** `YOUR_SERVER` ve `YOUR_SECRET_KEY` alanlarını kendi ortamınıza göre güncelleyin. Redis servisinizin çalıştığından emin olun.
+> 🔔 **Not:** `YOUR_SERVER`, `YOUR_SECRET_KEY` ve `RedisConnection` alanlarını kendi ortamınıza göre güncelleyin. Redis servisinizin çalıştığından emin olun.
 
 ---
 
