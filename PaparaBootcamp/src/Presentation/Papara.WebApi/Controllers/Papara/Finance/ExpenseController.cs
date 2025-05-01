@@ -57,7 +57,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		[HttpDelete("{id:long}")]
-		[Authorize(Roles = "Admin")]
+		[Authorize(Roles = "Admin,Employee")]
 		public async Task<IActionResult> Delete(long id)
 		{
 			await Mediator.Send(new DeleteExpenseCommand(id));

@@ -11,7 +11,7 @@ using Papara.WebApi.Controllers.Base;
 namespace Papara.WebApi.Controllers.Papara.Corporation;
 
 [ApiController]
-[Route("api/Departments")]
+[Route("api/departments")]
 public class DepartmentController : ApiControllerBase
 {
 

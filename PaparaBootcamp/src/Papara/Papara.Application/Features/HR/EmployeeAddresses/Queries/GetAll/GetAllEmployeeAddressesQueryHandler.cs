@@ -44,9 +44,9 @@ public class GetAllEmployeeAddressesQueryHandler : IRequestHandler<GetAllEmploye
 			includes.Add(x => x.Employee);
 		}
 
-		var EmployeeAddresss = await _unitOfWork.Repository<EmployeeAddress>()
+		var EmployeeAddresses = await _unitOfWork.Repository<EmployeeAddress>()
 			.GetAllAsync(filter, includes.ToArray());
 
-		return EmployeeAddressConverters.EmployeeAddressConverterList(EmployeeAddresss);
+		return EmployeeAddressConverters.EmployeeAddressConverterList(EmployeeAddresses);
 	}
 }

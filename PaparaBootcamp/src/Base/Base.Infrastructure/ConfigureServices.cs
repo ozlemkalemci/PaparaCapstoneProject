@@ -1,6 +1,7 @@
 ﻿using Base.Application.Interfaces;
 using Base.Infrastructure.Services;
 using Base.Infrastructure.Services.Auth;
+using Base.Infrastructure.Services.Dapper;
 using Base.Infrastructure.Services.File;
 using Base.Infrastructure.Services.Redis;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +26,6 @@ public static class ConfigureServices
 		// Redis kayıtları
 		//services.AddSingleton<IConnectionMultiplexer>(
 		//	_ => ConnectionMultiplexer.Connect("localhost:6379"));
-		//services.AddScoped<IRedisService, RedisService>();
 
 		services.AddSingleton<IConnectionMultiplexer>(provider =>
 		{
@@ -34,7 +34,11 @@ public static class ConfigureServices
 			return ConnectionMultiplexer.Connect(redisConnectionString);
 		});
 
+		services.AddScoped<IRedisService, RedisService>();
+
 		services.AddScoped<IFileService, LocalFileService>();
+
+		services.AddScoped<IDapperService, DapperService>();
 
 		return services;
 	}

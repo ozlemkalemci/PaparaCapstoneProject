@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Base\Base.Infrastructure\Base.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Base\Base.Persistence\Base.Persistence.csproj" />
-    <ProjectReference Include="..\..\Papara\Papara.Infrastructure\Papara.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Papara\Papara.Application\Papara.Application.csproj" />
   </ItemGroup>
 
 </Project>
