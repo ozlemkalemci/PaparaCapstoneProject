@@ -69,10 +69,33 @@ Authorization: Bearer {{bearerToken}}
 
 > Redis çalışır durumda olmalıdır:
 
+---
+
+## ⚙️ appsettings.json Yapılandırması
+
 ```json
-// appsettings.json
-"RedisConnection": "localhost:6379"
+"ConnectionStrings": {
+  "PaparaSqlConnection": "Server=YOUR_SERVER;Initial Catalog=PaparaDb;Integrated Security=true;TrustServerCertificate=True;",
+  "BankSqlConnection": "Server=YOUR_SERVER;Initial Catalog=BankDb;Integrated Security=true;TrustServerCertificate=True;"
+},
+                        
+"RedisConnection": "localhost:6379",
+                        
+"JwtSettings": {
+  "SecretKey": "YOUR_SECRET_KEY",
+  "Issuer": "Papara.Auth",
+  "Audience": "Papara.WebApi",
+  "ExpirationInMinutes": 60
+},
+                        
+"FileSettings": {
+  "RootPath": "UploadedFiles"
+}
 ```
+
+> 🔔 **Not:** `YOUR_SERVER` ve `YOUR_SECRET_KEY` alanlarını kendi ortamınıza göre güncelleyin. Redis servisinizin çalıştığından emin olun.
+
+---
 
 ### 2️⃣ Migration & Database Kurulumu
 
@@ -126,6 +149,6 @@ dotnet run
 
 ## 👨‍💻 Geliştirici Bilgisi
 
-> Geliştirici: [Adınız]  
+> Geliştirici: Özlem Kalemci
 > Proje: Papara Expense Management  
 > Tarih: Mayıs 2025
