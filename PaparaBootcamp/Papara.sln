@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base.Infrastructure", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base.Persistence", "src\Base\Base.Persistence\Base.Persistence.csproj", "{F8CF9C1B-AFA8-48EA-BD40-70CAEA38949B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Papara.Wasm", "src\Presentation\Papara.Wasm\Papara.Wasm\Papara.Wasm.csproj", "{3D35D9DF-8E47-4323-8FA4-2123056CE54B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{F8CF9C1B-AFA8-48EA-BD40-70CAEA38949B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8CF9C1B-AFA8-48EA-BD40-70CAEA38949B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8CF9C1B-AFA8-48EA-BD40-70CAEA38949B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D35D9DF-8E47-4323-8FA4-2123056CE54B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D35D9DF-8E47-4323-8FA4-2123056CE54B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D35D9DF-8E47-4323-8FA4-2123056CE54B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D35D9DF-8E47-4323-8FA4-2123056CE54B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{D5778585-06EC-47BB-998A-B1A88FABA12F} = {DF30FE5A-22E4-49A7-8771-5C3A9F8C2A9A}
 		{8D443B3A-C2EA-4430-874C-C3DC14D528AC} = {DF30FE5A-22E4-49A7-8771-5C3A9F8C2A9A}
 		{F8CF9C1B-AFA8-48EA-BD40-70CAEA38949B} = {DF30FE5A-22E4-49A7-8771-5C3A9F8C2A9A}
+		{3D35D9DF-8E47-4323-8FA4-2123056CE54B} = {885FDD3C-494C-4F7F-A901-A6A753337016}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {483AAFBC-4F1E-4471-948E-A591BC6F4A26}

@@ -1,0 +1,75 @@
+﻿@page "/login"
+@using Blazored.Toast
+@using Blazored.Toast.Services
+@using Papara.Wasm.Services.Auth
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+@inject IToastService Toast
+
+<PageTitle>Giriş Yap</PageTitle>
+
+<div class="login-wrapper">
+    <img src="images/login_logo.png" alt="Login Logo" class="login-logo" />
+
+    <div class="login-form-container">
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Kullanıcı Adı</label>
+                <InputText id="username" class="form-control" @bind-Value="loginModel.UserName" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Şifre</label>
+                <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                @(isLoading ? "Giriş Yapılıyor..." : "Giriş Yap")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback OnLoginSuccess { get; set; }
+
+    private LoginModel loginModel = new();
+    private bool isLoading = false;
+
+    private async Task HandleLogin()
+    {
+        isLoading = true;
+
+        var success = await AuthService.LoginAsync(loginModel.UserName, loginModel.Password);
+
+        if (success)
+        {
+            await OnLoginSuccess.InvokeAsync();
+            // Toast.ShowSuccess("Giriş başarılı!");
+            // await Task.Delay(500);
+            // Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Toast.ShowError("Giriş başarısız!");
+        }
+
+        isLoading = false;
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Kullanıcı adı zorunludur.")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Şifre zorunludur.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

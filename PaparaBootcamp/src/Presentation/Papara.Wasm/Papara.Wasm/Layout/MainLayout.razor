@@ -1,0 +1,25 @@
+﻿@using Blazored.Toast
+@using Blazored.Toast.Configuration
+@inherits LayoutComponentBase
+
+<div class="layout-wrapper">
+	<div class="top-row">
+		@* <a class="navbar-brand" href="/">Papara | Patika .Net Bootcamp</a> *@
+		<span class="navbar-right-title">Papara | Patika .Net Bootcamp</span>
+	</div>
+
+	<div class="layout-body">
+		<div class="sidebar">
+			<NavMenu />
+		</div>
+
+		<main class="main-content">
+			@Body
+		</main>
+	</div>
+
+	<BlazoredToasts Position="ToastPosition.TopRight"
+					Timeout="5"
+					ShowProgressBar="true"
+					RemoveToastsOnNavigation="true" />
+</div>

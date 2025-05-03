@@ -1,0 +1,53 @@
+﻿@page "/"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@using Blazored.Toast
+@using Blazored.Toast.Services
+@using Papara.Wasm.Services.Auth
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+@inject IToastService Toast
+
+<PageTitle>Anasayfa</PageTitle>
+
+@if (isAuthenticated)
+{
+	<p>Hoş geldin, <strong>@userName</strong> 👋</p>
+}
+else
+{
+	<Login OnLoginSuccess="HandleLoginSuccess" />
+}
+
+@code {
+	private bool isAuthenticated = false;
+	private string userName = "";
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+
+		if (isAuthenticated)
+		{
+			userName = user.Identity?.Name ?? "Kullanıcı";
+		}
+	}
+
+	private async Task HandleLoginSuccess()
+	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+		userName = user.Identity?.Name ?? "";
+
+
+		Toast.ShowSuccess("Giriş başarılı!");
+		Navigation.NavigateTo("/");
+	}
+}
