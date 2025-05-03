@@ -51,7 +51,7 @@ public class GlobalExceptionMiddleware
 
 			case UnauthorizedAccessException:
 				response.StatusCode = (int)HttpStatusCode.Unauthorized;
-				errorDetails = new { message = "Yetkisiz erişim." };
+				errorDetails = new { message = $"Yetkisiz erişim. {exception.Message}" };
 				break;
 
 			case ForbidException:
@@ -66,7 +66,7 @@ public class GlobalExceptionMiddleware
 
 			case InvalidOperationException:
 				response.StatusCode = (int)HttpStatusCode.BadRequest;
-				errorDetails = new { message = "İş kurallarına aykırı işlem" };
+				errorDetails = new { message = $"İş kuralı hatası: {exception.Message}" };
 				break;
 
 			default:

@@ -23,17 +23,15 @@ public class GetPersonnelExpenseHistoryQueryHandler : IRequestHandler<GetPersonn
 	public async Task<List<PersonnelExpenseReportResponse>> Handle(GetPersonnelExpenseHistoryQuery request, CancellationToken cancellationToken)
 	{
 		const string sql = @"
-                SELECT 
-                    e.Id AS ExpenseId,
-                    e.ExpenseDate,
-                    e.Amount,
-                    e.Description,
-                    CAST(a.Status AS TINYINT) AS Status,
-                    et.Name AS ExpenseType
-                FROM Finance.Expenses e
-                INNER JOIN Finance.ExpenseTypes et ON e.ExpenseTypeId = et.Id
-                INNER JOIN Finance.ExpenseApprovals a ON e.Id = a.ExpenseId AND a.IsActive = 1
-                WHERE e.EmployeeId = @EmployeeId AND e.IsActive = 1";
+			SELECT 
+				ExpenseId,
+				ExpenseDate,
+				Amount,
+				Description,
+				CAST(ApprovalStatus AS TINYINT) AS Status,
+				ExpenseType
+			FROM vw_PersonnelExpenseHistory
+			WHERE EmployeeId = @EmployeeId";
 
 		var result = await _dapperService.QueryAsync<PersonnelExpenseReportResponse>(sql, new { request.EmployeeId });
 		return result.ToList();
