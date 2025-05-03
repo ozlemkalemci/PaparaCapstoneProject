@@ -18,6 +18,10 @@ public class ExpenseTypeController : ApiControllerBase
 	{
 	}
 
+	/// <summary>
+	/// Tüm masraf türlerini listeler.
+	/// </summary>
+	/// <returns>Masraf türleri listesi</returns>
 	[HttpGet]
 	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetAll()
@@ -26,6 +30,11 @@ public class ExpenseTypeController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Belirli bir masraf türünü ID bilgisine göre getirir.
+	/// </summary>
+	/// <param name="id">Masraf türü ID bilgisi</param>
+	/// <returns>Masraf türü detayları</returns>
 	[HttpGet("{id:long}")]
 	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetById(long id)
@@ -34,6 +43,11 @@ public class ExpenseTypeController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Yeni bir masraf türü oluşturur.
+	/// </summary>
+	/// <param name="request">Masraf türü oluşturma isteği</param>
+	/// <returns>Oluşturulan masraf türü</returns>
 	[HttpPost]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Create([FromBody] CreateExpenseTypeRequest request)
@@ -42,6 +56,12 @@ public class ExpenseTypeController : ApiControllerBase
 		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
 	}
 
+	/// <summary>
+	/// Var olan bir masraf türünü günceller.
+	/// </summary>
+	/// <param name="id">Masraf türü ID</param>
+	/// <param name="request">Güncelleme isteği</param>
+	/// <returns>Güncellenmiş masraf türü</returns>
 	[HttpPut("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Update(long id, [FromBody] UpdateExpenseTypeRequest request)
@@ -50,6 +70,10 @@ public class ExpenseTypeController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Belirli bir masraf türünü siler.
+	/// </summary>
+	/// <param name="id">Silinecek masraf türünün ID bilgisi</param>
 	[HttpDelete("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Delete(long id)

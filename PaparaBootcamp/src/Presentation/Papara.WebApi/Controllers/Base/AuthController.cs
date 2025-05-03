@@ -9,8 +9,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Papara.WebApi.Controllers.Base;
+
+[ApiController]
+[Route("api/auth")]
 public class AuthController : ApiControllerBase
 {
+	/// <summary>
+	/// Sisteme giriş yapar ve JWT token döner.
+	/// </summary>
+	/// <param name="request">Giriş bilgileri</param>
 	[HttpPost("login")]
 	public async Task<IActionResult> Login([FromBody] LoginRequest request)
 	{
@@ -18,6 +25,10 @@ public class AuthController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Yeni kullanıcı kaydı oluşturur.
+	/// </summary>
+	/// <param name="request">Kayıt bilgileri</param>
 	[HttpPost("register")]
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request)
 	{
@@ -25,6 +36,9 @@ public class AuthController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Oturumu sonlandırır ve token’ı kara listeye ekler.
+	/// </summary>
 	[HttpPost("logout")]
 	[Authorize]
 	public async Task<IActionResult> Logout()
@@ -32,6 +46,11 @@ public class AuthController : ApiControllerBase
 		await Mediator.Send(new LogoutCommand());
 		return Ok(new { message = "Çıkış yapıldı." });
 	}
+
+	/// <summary>
+	/// Yeni bir access token almak için refresh token kullanılır.
+	/// </summary>
+	/// <param name="request">Refresh token bilgisi</param>
 	[HttpPost("refresh-token")]
 	public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
 	{

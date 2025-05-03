@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Papara.Application;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -105,6 +106,10 @@ builder.Services.AddSwaggerGen(setup =>
 			new List<string>()
 		}
 	});
+
+	var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+	setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
 });
 
 // Katman servis kayýtlarý
@@ -125,6 +130,26 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseGlobalExceptionHandler();
 app.UseAuthentication();
+
+app.UseStatusCodePages(async context =>
+{
+	var response = context.HttpContext.Response;
+
+	if (response.StatusCode == (int)HttpStatusCode.Forbidden)
+	{
+		response.ContentType = "application/json";
+		var json = JsonSerializer.Serialize(new { message = "Bu iþlemi yapmak için yetkiniz yok." });
+		await response.WriteAsync(json);
+	}
+	else if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+	{
+		response.ContentType = "application/json";
+		var json = JsonSerializer.Serialize(new { message = "Giriþ yapmanýz gerekiyor." });
+		await response.WriteAsync(json);
+	}
+});
+
+
 app.UseAuthorization();
 app.MapControllers();
 

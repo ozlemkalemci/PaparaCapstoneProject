@@ -4,6 +4,7 @@ using MediatR;
 using Papara.Application.Features.Finance.ExpenseApprovals.Converters;
 using Papara.Application.Features.Finance.ExpenseApprovals.Models;
 using Papara.Domain.Entities.Finance;
+using Papara.Domain.Enums.Finance;
 using System.Linq.Expressions;
 
 namespace Papara.Application.Features.Finance.ExpenseApprovals.Queries.GetAll;
@@ -26,6 +27,9 @@ public class GetAllExpenseApprovalsQueryHandler : IRequestHandler<GetAllExpenseA
 		{
 			filter = filter.And(x => x.ExpenseId == request.Request.ExpenseId);
 		}
+
+		if (request.Request.Status.HasValue && !Enum.IsDefined(typeof(ExpenseApprovalStatus), request.Request.Status.Value))
+			throw new InvalidOperationException("Geçersiz onay durumu girildi.");
 
 		if (request.Request.Status.HasValue)
 		{

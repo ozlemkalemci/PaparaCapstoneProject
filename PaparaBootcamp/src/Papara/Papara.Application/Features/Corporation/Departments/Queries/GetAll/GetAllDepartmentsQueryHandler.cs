@@ -22,11 +22,6 @@ public class GetAllDepartmentsQueryHandler : IRequestHandler<GetAllDepartmentsQu
 		var filter = (Expression<Func<Department, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Department, object>>>();
 
-		if (!string.IsNullOrWhiteSpace(request.Request.DepartmentName))
-		{
-			filter = filter.And(x => x.DepartmentName.Contains(request.Request.DepartmentName));
-		}
-
 		var Departments = await _unitOfWork.Repository<Department>()
 			.GetAllAsync(filter, includes.ToArray());
 

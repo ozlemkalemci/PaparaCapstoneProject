@@ -7,7 +7,6 @@ using Papara.Application.Features.HR.Employees.Queries.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Papara.WebApi.Controllers.Base;
-using System.Security.Claims;
 using Papara.Application.Features.HR.Employees.Models;
 
 namespace Papara.WebApi.Controllers.Papara.HR;
@@ -23,6 +22,9 @@ public class EmployeesController : ApiControllerBase
 		_userContextService = userContextService;
 	}
 
+	/// <summary>
+	/// Tüm çalışanları listeler. Yalnızca admin yetkilidir.
+	/// </summary>
 	[HttpGet]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> GetAll([FromQuery] GetEmployeeRequest request)
@@ -31,6 +33,9 @@ public class EmployeesController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Çalışanı ID'ye göre getirir. Admin ve ilgili çalışan erişebilir.
+	/// </summary>
 	[HttpGet("{id:long}")]
 	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetById(long id)
@@ -39,6 +44,9 @@ public class EmployeesController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Yeni çalışan kaydı oluşturur. Sadece admin kullanabilir.
+	/// </summary>
 	[HttpPost]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Create([FromBody] CreateEmployeeRequest request)
@@ -47,6 +55,9 @@ public class EmployeesController : ApiControllerBase
 		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
 	}
 
+	/// <summary>
+	/// Mevcut çalışan kaydını günceller. Sadece admin kullanabilir.
+	/// </summary>
 	[HttpPut("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Update(long id, [FromBody] UpdateEmployeeRequest request)
@@ -55,6 +66,9 @@ public class EmployeesController : ApiControllerBase
 		return Ok(result);
 	}
 
+	/// <summary>
+	/// Çalışanı siler. Sadece admin kullanabilir.
+	/// </summary>
 	[HttpDelete("{id:long}")]
 	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Delete(long id)

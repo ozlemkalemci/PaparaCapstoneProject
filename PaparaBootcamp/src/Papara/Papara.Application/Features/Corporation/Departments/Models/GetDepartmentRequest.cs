@@ -2,5 +2,4 @@
 
 public class GetDepartmentRequest
 {
-	public string? DepartmentName { get; set; } = null;
 }

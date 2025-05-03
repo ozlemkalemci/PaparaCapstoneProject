@@ -19,7 +19,7 @@ namespace Papara.Application.Services.Banking
 
 			try
 			{
-				// Basit bir random PaymentReferenceNumber üretiyoruz.
+				// random PaymentReferenceNumber üretme:
 				var paymentReference = GeneratePaymentReference();
 
 				var payment = new ExpensePayment

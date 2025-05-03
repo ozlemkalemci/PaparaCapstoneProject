@@ -5,6 +5,8 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Papara.Application.Features.HR.Employees.Commands.Create;
 using Papara.Application.Services.Auth;
+using Papara.Application.Services.Banking;
+using Papara.Application.Services.Finance.Approvals;
 
 namespace Papara.Application;
 
@@ -21,6 +23,8 @@ public static class ConfigureServices
 
 		services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 		services.AddScoped<IUserService, UserService>();
+		services.AddScoped<IExpenseApprovalService, ExpenseApprovalService>();
+		services.AddScoped<IBankTransferSimulatorService, BankTransferSimulatorService>();
 		return services;
 	}
 }
