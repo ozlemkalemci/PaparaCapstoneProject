@@ -1,0 +1,109 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Sayfanın tamamını kapla */
+    overflow: hidden;
+}
+
+.layout-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto; /* İçeri taşarsa scroll çıksın, taşma yapmasın */
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    background-image: linear-gradient(0deg, #ffffff 0%, #f2f2f2 100%) !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e0e0e0;
+    padding: 1rem;
+}
+
+.layout-wrapper {
+    display: flex;
+    flex-direction: column;
+   /* height: 100vh;*/
+}
+
+.top-row {
+    height: 64px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #000;
+    text-decoration: none;
+}
+
+.layout-body {
+    display: flex;
+    flex: 1;
+}
+
+.sidebar {
+    width: 250px;
+    background-image: linear-gradient(0deg, #ffffff 0%, #f2f2f2 100%) !important;
+    border-right: 1px solid #e0e0e0;
+    padding: 1rem;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.sidebar-logo {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+}
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: #f8f9fa;
+  
+}
+
+.login-logo {
+    width: 500px;
+    max-width: 95%;
+    margin-bottom: 2rem;
+}
+
+.login-form-container {
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}

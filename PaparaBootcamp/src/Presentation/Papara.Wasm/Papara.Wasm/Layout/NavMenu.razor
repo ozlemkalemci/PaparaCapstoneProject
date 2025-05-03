@@ -1,0 +1,81 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Services.Auth
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+@implements IDisposable
+
+<div class="logo-container">
+	<img src="images/papara_mini_logo_transparant.png" alt="Papara Logo" class="sidebar-logo" />
+</div>
+
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+	<nav class="flex-column">
+		<div class="nav-item px-3">
+
+			@if (isAuthenticated)
+			{
+				<NavLink href="/user" class="nav-link text-dark" activeClass="fw-bold text-primary">👤 Kullanıcı İşlemleri</NavLink>
+				<NavLink href="/expenses" class="nav-link text-dark" activeClass="fw-bold text-primary">💼 Masraf İşlemleri</NavLink>
+				<NavLink class="nav-link text-dark" href="" @onclick="Logout">
+					<span class="oi oi-account-logout" aria-hidden="true"></span> Çıkış Yap
+				</NavLink>
+			}
+			else
+			{
+				@* <NavLink href="/login" class="nav-link text-dark">
+					<span class="oi oi-account-login" aria-hidden="true"></span> Giriş Yap
+				</NavLink> *@
+			}
+		</div>
+	</nav>
+</div>
+
+@code {
+	private bool collapseNavMenu = true;
+	private string? userName;
+	private bool isAuthenticated;
+
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+		await LoadUserStateAsync();
+	}
+
+	private async Task LoadUserStateAsync()
+	{
+		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+		userName = isAuthenticated ? user.Identity?.Name : null;
+
+		StateHasChanged();
+	}
+
+	private async void OnAuthStateChanged(Task<AuthenticationState> task)
+	{
+		await LoadUserStateAsync();
+	}
+
+	private async Task Logout()
+	{
+		await AuthService.LogoutAsync();
+		Navigation.NavigateTo("/", forceLoad: true);
+	}
+
+	public void Dispose()
+	{
+		AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
+	}
+}
