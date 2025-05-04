@@ -5,6 +5,7 @@ using Base.Infrastructure;
 using Base.Infrastructure.Middlewares;
 using Base.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Papara.Application;
@@ -14,6 +15,9 @@ using System.Text;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
 
 // JWT Settings Configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -112,6 +116,8 @@ builder.Services.AddSwaggerGen(setup =>
 
 });
 
+
+
 // Katman servis kayýtlarý
 builder.Services.AddBaseApplicationServices();
 builder.Services.AddBasePersistence(builder.Configuration);
@@ -125,6 +131,15 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+	FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "UploadedFiles")),
+	RequestPath = "/files"
+});
+
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

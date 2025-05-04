@@ -1,0 +1,130 @@
+﻿@page "/expenses/add"
+@using Blazored.Toast.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Services
+@using Papara.Wasm.Shared.Models
+@inject HttpClient Http
+@inject IToastService Toast
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+@inject ConfigurationModel Config
+
+<h3>➕ Yeni Masraf Ekle</h3>
+
+@if (isLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <EditForm Model="expenseModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Tarih</label>
+            <InputDate @bind-Value="expenseModel.ExpenseDate" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tutar</label>
+            <InputNumber @bind-Value="expenseModel.Amount" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Masraf Türü</label>
+            <InputSelect @bind-Value="expenseModel.ExpenseTypeId" class="form-select">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var type in expenseTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <InputTextArea @bind-Value="expenseModel.Description" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Belge (Opsiyonel)</label>
+            <InputFile OnChange="HandleFileChange" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </EditForm>
+}
+
+@code {
+    private bool isLoading = true;
+    private CreateExpenseRequest expenseModel = new();
+    private IBrowserFile? selectedFile;
+    private List<ExpenseTypeResponse> expenseTypes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var id = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var employeeIdValue = user.FindFirst("EmployeeId")?.Value;
+                if (!string.IsNullOrWhiteSpace(employeeIdValue) && long.TryParse(employeeIdValue, out var employeeId))
+                {
+                    expenseModel.EmployeeId = employeeId;
+                }
+            }
+
+            expenseTypes = await Http.GetFromJsonAsync<List<ExpenseTypeResponse>>("expensetypes") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowError("Sayfa yüklenirken hata oluştu.");
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("expenses", expenseModel);
+            var createdExpense = await response.Content.ReadFromJsonAsync<CreateExpenseResponse>();
+
+            if (selectedFile != null && createdExpense != null)
+            {
+                var content = new MultipartFormDataContent();
+                var fileContent = new StreamContent(selectedFile.OpenReadStream(5_000_000)); // max 5MB
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+
+                content.Add(fileContent, "File", selectedFile.Name);
+                content.Add(new StringContent(createdExpense.Id.ToString()), "ExpenseId");
+
+                await Http.PostAsync("expenseattachments", content);
+            }
+
+            Toast.ShowSuccess("Masraf başarıyla eklendi.");
+            Navigation.NavigateTo("/expenses");
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowError("Masraf eklenirken hata oluştu.");
+            Console.Error.WriteLine(ex);
+        }
+    }
+}

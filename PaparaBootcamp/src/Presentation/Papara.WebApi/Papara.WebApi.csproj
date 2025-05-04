@@ -24,4 +24,9 @@
 		<ProjectReference Include="..\..\Papara\Papara.Application\Papara.Application.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="wwwroot\UploadedFiles\ExpenseAttachments\2025\04\29\Ekran Resmi 2022-09-28 10_57_52_67f2450d-bcbc-4cc4-be72-fbeb7b1ec6da.png" />
+	  <None Include="wwwroot\UploadedFiles\ExpenseAttachments\2025\05\03\fatura22_3e95a6e8-af10-48fc-bff5-8444f0b8e3ea.png" />
+	</ItemGroup>
+
 </Project>
