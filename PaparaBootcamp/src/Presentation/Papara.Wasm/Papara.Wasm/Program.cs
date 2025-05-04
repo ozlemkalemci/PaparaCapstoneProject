@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Papara.Wasm;
 using System.Text.Json;
@@ -7,6 +7,7 @@ using Blazored.LocalStorage;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Components.Authorization;
 using Papara.Wasm.Services.Auth;
+using Papara.Wasm.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -14,16 +15,46 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Config (appsettings.json i�inden)
+// Config (appsettings.json içinden)
 var apiUrl = builder.Configuration["ApiUrl"] ?? throw new Exception("ApiUrl not found in configuration");
+var fileBaseUrl = builder.Configuration["FileBaseUrl"] ?? throw new Exception("FileBaseUrl not found in configuration");
 
-// HttpClient (Papara.WebApi'ye istek atmak i�in)
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiUrl) });
+builder.Services.AddSingleton(new ConfigurationModel
+{
+	ApiUrl = apiUrl,
+	FileBaseUrl = fileBaseUrl
+});
+// HttpClient (Papara.WebApi'ye istek atmak için)
+builder.Services.AddScoped<AuthHeaderHandler>();
+builder.Services.AddScoped<RefreshTokenHandler>();
+
+builder.Services.AddScoped(sp =>
+{
+	var baseAddress = new Uri(apiUrl);
+
+	// LocalStorage bağımlılığı gerekli
+	var localStorage = sp.GetRequiredService<ILocalStorageService>();
+
+	// Handler'lar çözülüyor
+	var refreshHandler = sp.GetRequiredService<RefreshTokenHandler>();
+	var authHandler = sp.GetRequiredService<AuthHeaderHandler>();
+
+	// Handler zinciri oluşturuluyor: Refresh → Auth → HttpClientHandler
+	authHandler.InnerHandler = new HttpClientHandler();
+	refreshHandler.InnerHandler = authHandler;
+
+	// Zincirin başına RefreshTokenHandler veriliyor
+	return new HttpClient(refreshHandler)
+	{
+		BaseAddress = baseAddress
+	};
+});
+
 
 // Blazored Toast
 builder.Services.AddBlazoredToast();
 
-// Blazored LocalStorage (JWT ve kullan�c� verisi i�in)
+// Blazored LocalStorage (JWT ve kullanıcı verisi için)
 builder.Services.AddBlazoredLocalStorage(config =>
 {
 	config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
