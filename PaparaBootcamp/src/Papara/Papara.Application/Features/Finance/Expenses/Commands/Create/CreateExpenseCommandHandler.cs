@@ -45,7 +45,8 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
 				ExpenseTypeId = dto.ExpenseTypeId,
 				CreatedDate = DateTimeOffset.UtcNow,
 				CreatedById = _userContextService.GetCurrentUserId() ?? 0,
-				IsActive = true
+				IsActive = true,
+				Concluded = false,
 			};
 
 			await _unitOfWork.Repository<Expense>().AddAsync(expense);

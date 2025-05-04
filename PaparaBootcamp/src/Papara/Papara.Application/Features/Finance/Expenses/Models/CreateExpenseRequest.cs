@@ -7,4 +7,5 @@ public class CreateExpenseRequest
 	public decimal Amount { get; set; }
 	public string Description { get; set; } = null!;
 	public DateTimeOffset ExpenseDate { get; set; }
+	public bool Concluded { get; set; }
 }

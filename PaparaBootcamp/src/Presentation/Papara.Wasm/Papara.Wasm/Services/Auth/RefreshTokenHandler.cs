@@ -2,30 +2,42 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.IdentityModel.Tokens.Jwt;
+using Papara.Wasm.Shared.Models.Auth;
+using Papara.Wasm.Services;
 
 public class RefreshTokenHandler : DelegatingHandler
 {
 	private readonly ILocalStorageService _localStorage;
-
-	public RefreshTokenHandler(ILocalStorageService localStorage)
+	private readonly HttpClient _httpClient;
+	public RefreshTokenHandler(ILocalStorageService localStorage, ConfigurationModel config)
 	{
 		_localStorage = localStorage;
+		_httpClient = new HttpClient { BaseAddress = new Uri(config.ApiUrl) };
 	}
+
 
 	protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 	{
+		Console.WriteLine("🚀 RefreshTokenHandler çalıştı");
+
 		var token = await _localStorage.GetItemAsync<string>("access_token");
+		Console.WriteLine($"🔐 Token çekildi: {(token is null ? "YOK" : "VAR")}");
 
 		if (!string.IsNullOrWhiteSpace(token) && IsTokenExpired(token))
 		{
 			var refreshToken = await _localStorage.GetItemAsync<string>("refresh_token");
+			Console.WriteLine($"🔁 RefreshToken çekildi: {(refreshToken is null ? "YOK" : "VAR")}");
 
 			if (!string.IsNullOrWhiteSpace(refreshToken))
 			{
-				var response = await base.SendAsync(new HttpRequestMessage(HttpMethod.Post, "auth/refresh-token")
-				{
-					Content = JsonContent.Create(new { refreshToken })
-				}, cancellationToken);
+				Console.WriteLine("♻ Refresh işlemi başlatılıyor...");
+				//var response = await base.SendAsync(new HttpRequestMessage(HttpMethod.Post, "auth/refresh-token")
+				//{
+				//	Content = JsonContent.Create(new { refreshToken })
+				//}, cancellationToken);
+
+				var requestModel = new RefreshTokenRequest { RefreshToken = refreshToken };
+				var response = await _httpClient.PostAsJsonAsync("auth/refresh-token", requestModel);
 
 				if (response.IsSuccessStatusCode)
 				{
@@ -33,13 +45,17 @@ public class RefreshTokenHandler : DelegatingHandler
 
 					await _localStorage.SetItemAsync("access_token", result.AccessToken);
 					await _localStorage.SetItemAsync("refresh_token", result.RefreshToken);
+
+					Console.WriteLine("✅ Refresh işlemi başarılı");
+				}
+				else
+				{
+					Console.WriteLine("❌ Refresh token isteği başarısız");
 				}
 			}
 		}
 
-		// Refresh sonrası yeni token varsa onu ekle
 		var finalToken = await _localStorage.GetItemAsync<string>("access_token");
-
 		if (!string.IsNullOrWhiteSpace(finalToken))
 		{
 			request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", finalToken);
@@ -48,18 +64,17 @@ public class RefreshTokenHandler : DelegatingHandler
 		return await base.SendAsync(request, cancellationToken);
 	}
 
+
 	private bool IsTokenExpired(string token)
 	{
 		var handler = new JwtSecurityTokenHandler();
 		var jwt = handler.ReadJwtToken(token);
 		var exp = jwt.ValidTo;
+		bool expStation = exp < DateTimeOffset.UtcNow;
 
-		return exp < DateTime.UtcNow;
+		return expStation;
 	}
 
-	private class RefreshResponse
-	{
-		public string AccessToken { get; set; } = string.Empty;
-		public string RefreshToken { get; set; } = string.Empty;
-	}
+
+
 }

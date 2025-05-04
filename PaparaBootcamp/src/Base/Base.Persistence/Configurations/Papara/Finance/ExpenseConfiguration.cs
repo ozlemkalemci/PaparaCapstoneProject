@@ -34,6 +34,10 @@ namespace Base.Persistence.Configurations.Papara.Finance
 				.HasForeignKey(x => x.ExpenseTypeId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			builder.Property(x => x.Concluded)
+				.IsRequired()
+				.HasDefaultValue(false);
+
 			builder.HasMany(x => x.Attachments)
 				.WithOne(x => x.Expense)
 				.HasForeignKey(x => x.ExpenseId)

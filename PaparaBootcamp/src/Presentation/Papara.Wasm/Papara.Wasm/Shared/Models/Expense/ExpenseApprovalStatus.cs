@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Papara.Wasm.Shared;
+namespace Papara.Wasm.Shared.Models.Expense;
 
 public enum ExpenseApprovalStatus : byte
 {

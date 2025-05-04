@@ -11,7 +11,6 @@ using Papara.Domain.Enums.Bank;
 using Papara.Domain.Enums.Finance;
 
 namespace Papara.Application.Services.Finance.Approvals;
-
 public class ExpenseApprovalService : IExpenseApprovalService
 {
 	private readonly IUnitOfWork _unitOfWork;
@@ -34,57 +33,26 @@ public class ExpenseApprovalService : IExpenseApprovalService
 
 		try
 		{
-			var existingApprovals = await _unitOfWork.Repository<ExpenseApproval>()
-				.Where(x => x.ExpenseId == request.ExpenseId && x.IsActive);
+			// İlgili masraf kaydını getir, yoksa hata fırlat
+			var expense = await GetValidatedExpenseAsync(request.ExpenseId);
 
-			var activeApproval = existingApprovals.FirstOrDefault();
+			// Masraf için varsa eski beklemede onay kaydını sil, sonuçlanmışsa hata fırlat
+			await CheckAndSoftDeletePendingApprovalAsync(request.ExpenseId);
 
-			if (activeApproval?.Status == ExpenseApprovalStatus.Pending)
-			{
-				_unitOfWork.Repository<ExpenseApproval>().Delete(activeApproval);
-			}
-			else if (activeApproval != null)
-			{
-				throw new InvalidOperationException("Bu masraf zaten sonuçlanmış. Yeni onay yapılamaz.");
-			}
+			// Şirket bilgilerini doğrula, yoksa hata fırlat
+			var company = await GetValidatedCompanyAsync(request.CompanyId);
 
-			var expense = await _unitOfWork.Repository<Expense>().GetByIdAsync(request.ExpenseId, x => x.Employee);
-			if (expense == null)
-				throw new KeyNotFoundException("Masraf bulunamadı.");
+			// IBAN’lar kontrol edilir, eksikse hata fırlatılır
+			ValidateIBANs(company.CompanyIBAN, expense.Employee?.IBAN);
 
-			var company = await _unitOfWork.Repository<Company>().GetByIdAsync(request.CompanyId);
-			var senderIBAN = company.CompanyIBAN;
-			var receiverIBAN = expense.Employee?.IBAN;
+			// Yeni onay kaydı oluşturulur ve masraf “Concluded” olarak işaretlenir
+			var approval = await CreateApprovalAsync(request, expense);
 
-			if (string.IsNullOrWhiteSpace(senderIBAN) || string.IsNullOrWhiteSpace(receiverIBAN))
-				throw new InvalidOperationException("IBAN bilgisi eksik.");
-
-			var approval = new ExpenseApproval
-			{
-				ExpenseId = request.ExpenseId,
-				Status = ExpenseApprovalStatus.Approved,
-				Description = request.Description,
-				ApprovedById = _userContextService.GetCurrentUserId(),
-				ApprovedDate = DateTimeOffset.UtcNow,
-				CreatedDate = DateTimeOffset.UtcNow,
-				CreatedById = _userContextService.GetCurrentUserId() ?? 0,
-				IsActive = true
-			};
-
-			await _unitOfWork.Repository<ExpenseApproval>().AddAsync(approval);
-			await _unitOfWork.CommitAsync();
-
-			BankTransferRequest bankTransferRequest = new BankTransferRequest
-			{
-				ExpenseId = request.ExpenseId,
-				Amount = expense.Amount,
-				SenderIBAN = senderIBAN,
-				ReceiverIBAN = receiverIBAN,
-				TransferType = TransferType.EFT
-			};
-			await _bankTransferSimulatorService.TransferAsync(bankTransferRequest);
+			// Banka transferi simülasyonu gerçekleştirilir
+			await SimulateBankTransferAsync(request, expense, company);
 
 			await transaction.CommitAsync();
+
 			return ExpenseApprovalConverters.ExpenseApprovalConverter(approval);
 		}
 		catch
@@ -92,6 +60,79 @@ public class ExpenseApprovalService : IExpenseApprovalService
 			await transaction.RollbackAsync();
 			throw;
 		}
+	}
+
+
+	private async Task<Expense> GetValidatedExpenseAsync(long expenseId)
+	{
+		var expense = await _unitOfWork.Repository<Expense>().GetByIdAsync(expenseId, x => x.Employee);
+		if (expense == null)
+			throw new KeyNotFoundException("Masraf bulunamadı.");
+		return expense;
+	}
+
+	private async Task CheckAndSoftDeletePendingApprovalAsync(long expenseId)
+	{
+		var approvals = await _unitOfWork.Repository<ExpenseApproval>()
+			.Where(x => x.ExpenseId == expenseId && x.IsActive);
+
+		var existing = approvals.FirstOrDefault();
+
+		if (existing?.Status == ExpenseApprovalStatus.Pending)
+			_unitOfWork.Repository<ExpenseApproval>().Delete(existing);
+		else if (existing != null)
+			throw new InvalidOperationException("Bu masraf zaten sonuçlanmış. Yeni onay yapılamaz.");
+	}
+
+	private async Task<Company> GetValidatedCompanyAsync(long companyId)
+	{
+		var company = await _unitOfWork.Repository<Company>().GetByIdAsync(companyId);
+		if (company == null)
+			throw new KeyNotFoundException("Şirket bulunamadı.");
+		return company;
+	}
+
+	private void ValidateIBANs(string? sender, string? receiver)
+	{
+		if (string.IsNullOrWhiteSpace(sender) || string.IsNullOrWhiteSpace(receiver))
+			throw new InvalidOperationException("IBAN bilgisi eksik.");
+	}
+
+	private async Task<ExpenseApproval> CreateApprovalAsync(CreateAndTransferApprovalRequest request, Expense expense)
+	{
+		var approval = new ExpenseApproval
+		{
+			ExpenseId = request.ExpenseId,
+			Status = ExpenseApprovalStatus.Approved,
+			Description = request.Description,
+			ApprovedById = _userContextService.GetCurrentUserId(),
+			ApprovedDate = DateTimeOffset.UtcNow,
+			CreatedDate = DateTimeOffset.UtcNow,
+			CreatedById = _userContextService.GetCurrentUserId() ?? 0,
+			IsActive = true
+		};
+
+		await _unitOfWork.Repository<ExpenseApproval>().AddAsync(approval);
+
+		expense.Concluded = true;
+		_unitOfWork.Repository<Expense>().Update(expense);
+
+		await _unitOfWork.CommitAsync();
+		return approval;
+	}
+
+	private async Task SimulateBankTransferAsync(CreateAndTransferApprovalRequest request, Expense expense, Company company)
+	{
+		var transfer = new BankTransferRequest
+		{
+			ExpenseId = request.ExpenseId,
+			Amount = expense.Amount,
+			SenderIBAN = company.CompanyIBAN,
+			ReceiverIBAN = expense.Employee?.IBAN,
+			TransferType = TransferType.EFT
+		};
+
+		await _bankTransferSimulatorService.TransferAsync(transfer);
 	}
 }
 

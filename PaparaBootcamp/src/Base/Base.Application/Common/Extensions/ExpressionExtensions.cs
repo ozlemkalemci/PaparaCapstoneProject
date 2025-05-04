@@ -28,4 +28,12 @@ public static class ExpressionExtensions
 		var body = Expression.Not(Expression.Invoke(expr, parameter));
 		return Expression.Lambda<Func<T, bool>>(body, parameter);
 	}
+
+	//public static Expression<Func<T, bool>> OrExpression(Expression<Func<T, bool>> filter, Expression<Func<T, bool>> newExp)
+	//{
+	//	var param = Expression.Parameter(typeof(T), "x");
+	//	var body = Expression.Or(Expression.Invoke(filter, param), Expression.Invoke(newExp, param));
+	//	filter = Expression.Lambda<Func<T, bool>>(body, param);
+	//	return filter;
+	//}
 }

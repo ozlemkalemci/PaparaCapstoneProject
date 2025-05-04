@@ -11,40 +11,81 @@
 	<img src="images/papara_mini_logo_transparant.png" alt="Papara Logo" class="sidebar-logo" />
 </div>
 
+@if (isAuthenticated)
+{
+	<div class="nav-section">
+		<button class="sidebar-toggle" @onclick="ToggleUserMenu">👤 Kullanıcı İşlemleri</button>
+		@if (isUserMenuOpen)
+		{
+			<ul class="sidebar-menu">
+				@if (userRole == "Employee")
+				{
+					<li><NavLink href="/employee/profile" class="sidebar-link" activeClass="active">🧑 Profil</NavLink></li>
+				}
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-	<nav class="flex-column">
-		<div class="nav-item px-3">
+				<li><NavLink href="/employee/address" class="sidebar-link" activeClass="active">🏠 Adres Bilgileri</NavLink></li>
+				<li><NavLink href="/employee/phone" class="sidebar-link" activeClass="active">📞 Telefon Bilgileri</NavLink></li>
 
-			@if (isAuthenticated)
-			{
-				<NavLink href="/user" class="nav-link text-dark" activeClass="fw-bold text-primary">👤 Kullanıcı İşlemleri</NavLink>
-				<NavLink href="/expenses" class="nav-link text-dark" activeClass="fw-bold text-primary">💼 Masraf İşlemleri</NavLink>
-				<NavLink class="nav-link text-dark" href="" @onclick="Logout">
-					<span class="oi oi-account-logout" aria-hidden="true"></span> Çıkış Yap
-				</NavLink>
-			}
-			else
-			{
-				@* <NavLink href="/login" class="nav-link text-dark">
-					<span class="oi oi-account-login" aria-hidden="true"></span> Giriş Yap
-				</NavLink> *@
-			}
-		</div>
-	</nav>
-</div>
+				@if (userRole == "Admin")
+				{
+					<li><NavLink href="/employee/profile" class="sidebar-link" activeClass="active">🧑 Personeller </NavLink></li>
+					<li><NavLink href="/employee/create-user" class="sidebar-link" activeClass="active">➕ Kullanıcı Oluştur</NavLink></li>
+					<li><NavLink href="/employee/create-employee" class="sidebar-link" activeClass="active">👷 Personel Oluştur</NavLink></li>
+				}
+
+			</ul>
+		}
+
+		<button class="sidebar-toggle" @onclick="ToggleExpenseMenu">💼 Masraf İşlemleri</button>
+		@if (isExpenseMenuOpen)
+		{
+			<ul class="sidebar-menu">
+				@if (userRole == "Employee")
+				{
+					<li><NavLink href="/expenses" class="sidebar-link" activeClass="active">📄 Masraf Oluştur</NavLink></li>
+				}
+				@if (userRole == "Admin")
+				{
+					<li><NavLink href="/expense-approve" class="sidebar-link" activeClass="active">✅ Masraf Onay</NavLink></li>
+				}
+			</ul>
+		}
+
+		<button class="sidebar-toggle" @onclick="ToggleReportsMenu">📊 Raporlar</button>
+		@if (isReportsMenuOpen)
+		{
+			<ul class="sidebar-menu">
+				@if (userRole == "Employee")
+				{
+					<li><NavLink href="/reports/personnel-expense-history" class="sidebar-link">📄 Harcama Geçmişim</NavLink></li>
+				}
+				@if (userRole == "Admin")
+				{
+					<li><NavLink href="/reports/admin-summary" class="sidebar-link">🧾 Masraf Özeti</NavLink></li>
+					<li><NavLink href="/reports/personnel-spending-summary" class="sidebar-link">👥 Personel Harcama</NavLink></li>
+					<li><NavLink href="/reports/approval-status-summary" class="sidebar-link">✅ Onay/Red Durumu</NavLink></li>
+				}
+			</ul>
+		}
+
+		<button class="sidebar-link text-danger" @onclick="Logout">🚪 Çıkış Yap</button>
+	</div>
+}
+
 
 @code {
 	private bool collapseNavMenu = true;
-	private string? userName;
+	private bool isReportsMenuOpen = false;
+	private bool isExpenseMenuOpen = false;
+	private bool isUserMenuOpen = false;
+	private string? userRole;
 	private bool isAuthenticated;
 
 	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-	private void ToggleNavMenu()
-	{
-		collapseNavMenu = !collapseNavMenu;
-	}
+	private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+	private void ToggleReportsMenu() => isReportsMenuOpen = !isReportsMenuOpen;
+	private void ToggleExpenseMenu() => isExpenseMenuOpen = !isExpenseMenuOpen;
+	private void ToggleUserMenu() => isUserMenuOpen = !isUserMenuOpen;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -56,9 +97,10 @@
 	{
 		var authState = await AuthStateProvider.GetAuthenticationStateAsync();
 		var user = authState.User;
-
 		isAuthenticated = user.Identity?.IsAuthenticated ?? false;
-		userName = isAuthenticated ? user.Identity?.Name : null;
+
+		if (isAuthenticated)
+			userRole = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
 		StateHasChanged();
 	}

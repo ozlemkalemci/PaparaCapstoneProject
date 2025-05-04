@@ -49,6 +49,7 @@ public class UpdateExpenseCommandHandler : IRequestHandler<UpdateExpenseCommand,
 		entity.Amount = dto.Amount;
 		entity.Description = dto.Description;
 		entity.ExpenseDate = dto.ExpenseDate;
+		entity.Concluded = dto.Concluded;
 		entity.ExpenseTypeId = dto.ExpenseTypeId;
 
 		_unitOfWork.Repository<Expense>().Update(entity);

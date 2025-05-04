@@ -38,6 +38,8 @@ public class AuthService : IAuthService
 			await customProvider.NotifyUserAuthentication(result.AccessToken);
 		}
 
+		Console.WriteLine("🎯 Login sonrası token: " + result.AccessToken);
+
 		return true;
 	}
 

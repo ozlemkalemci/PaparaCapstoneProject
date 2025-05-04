@@ -71,4 +71,12 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-await builder.Build().RunAsync();
+//await builder.Build().RunAsync();
+
+var host = builder.Build();
+
+var localStorage = host.Services.GetRequiredService<ILocalStorageService>();
+await localStorage.ContainKeyAsync("access_token"); 
+
+await host.RunAsync();
+
