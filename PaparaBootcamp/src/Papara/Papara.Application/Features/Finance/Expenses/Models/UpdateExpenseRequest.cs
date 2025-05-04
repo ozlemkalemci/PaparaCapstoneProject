@@ -7,4 +7,5 @@ public class UpdateExpenseRequest
 	public DateTimeOffset ExpenseDate { get; set; }
 	public long ExpenseTypeId { get; set; }
 	public bool IsActive { get; set; }
+	public bool Concluded { get; set; }
 }

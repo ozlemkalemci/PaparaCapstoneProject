@@ -34,6 +34,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// Tüm masraf onaylarını filtreli olarak listeler.
 		/// </summary>
 		[HttpGet]
+		
 		public async Task<IActionResult> GetAll([FromQuery] GetExpenseApprovalRequest request)
 		{
 			var result = await Mediator.Send(new GetAllExpenseApprovalsQuery(request));

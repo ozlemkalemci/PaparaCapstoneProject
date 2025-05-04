@@ -1,0 +1,143 @@
+﻿@page "/reports/personnel-expense-history"
+
+<h3 class="mb-4">📋 Personel Masraf Geçmişi</h3>
+
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
+@using System.Security.Claims
+@using Blazored.Toast.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Extensions
+@using Papara.Wasm.Services
+@using Papara.Wasm.Shared.Models
+@using Papara.Wasm.Shared.Models.Expense
+@using Papara.Wasm.Shared.Models.Expense
+@inject HttpClient Http
+@inject IToastService Toast
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject ConfigurationModel Config
+
+@if (isLoading)
+{
+	<p>Yükleniyor...</p>
+}
+else if (expenses?.Any() != true)
+{
+	<p>Hiç masraf bulunamadı.</p>
+}
+else
+{
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Tarih</th>
+				<th>Tutar</th>
+				<th>Durum</th>
+				<th>Kategori</th>
+				<th>Açıklama</th>
+				<th>Belge</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var expense in expenses)
+			{
+				<tr>
+					<td>@expense.ExpenseDate.ToString("dd.MM.yyyy")</td>
+					<td>@expense.Amount.ToString("C")</td>
+					<td>@expense.Status.GetDisplayName()</td>
+					<td>@expense.ExpenseType</td>
+					<td>@expense.Description</td>
+					<td>
+						<button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.ExpenseId)">📎 Belge</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@if (isModalVisible && !string.IsNullOrEmpty(selectedFileUrl))
+{
+	<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Belge Görüntüleme</h5>
+					<button type="button" class="btn-close" @onclick="CloseModal"></button>
+				</div>
+				<div class="modal-body">
+					<img src="@selectedFileUrl" alt="Belge" class="img-fluid" />
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	private List<PersonnelExpenseReportResponse>? expenses;
+	private bool isLoading = true;
+	private string? selectedFileUrl;
+	private bool isModalVisible = false;
+
+	private const string FileBaseUrl = "https://localhost:7171/uploads/";
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			var authState = await AuthProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			if (user.Identity?.IsAuthenticated == true)
+			{
+				var empIdClaim = user.FindFirst("EmployeeId")?.Value;
+
+				if (!string.IsNullOrEmpty(empIdClaim) && long.TryParse(empIdClaim, out var employeeId))
+				{
+					expenses = await Http.GetFromJsonAsync<List<PersonnelExpenseReportResponse>>(
+						$"expensereports/personnel-expense-history?EmployeeId={employeeId}");
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.Error.WriteLine($"Masraf listeleme hatası: {ex}");
+			Toast.ShowError("Masraflar yüklenirken bir hata oluştu.");
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+	private async Task ShowAttachmentModal(long expenseId)
+	{
+		try
+		{
+			var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>($"expenseattachments?ExpenseId={expenseId}");
+			var file = response?.FirstOrDefault();
+
+			if (file != null)
+			{
+				selectedFileUrl = $"{Config.FileBaseUrl}{file.FilePath}";
+				isModalVisible = true;
+			}
+			else
+			{
+				Toast.ShowInfo("Bu masrafa ait bir belge bulunamadı.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError($"Belge alınırken hata oluştu: {ex.Message}");
+		}
+	}
+
+	private void CloseModal()
+	{
+		selectedFileUrl = null;
+		isModalVisible = false;
+	}
+}

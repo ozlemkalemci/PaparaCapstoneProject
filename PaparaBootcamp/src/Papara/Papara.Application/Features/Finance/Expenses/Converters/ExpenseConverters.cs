@@ -17,12 +17,15 @@ public static class ExpenseConverters
 			Description = item.Description,
 			ExpenseDate = item.ExpenseDate,
 			ExpenseTypeId = item.ExpenseTypeId,
+			Concluded = item.Concluded,
 
 			ResponseEmployee = item.Employee == null ? null :
 				EmployeeConverters.EmployeeConverter(item.Employee),
 
 			ResponseExpenseType = item.ExpenseType == null ? null :
 				ExpenseTypeConverters.ExpenseTypeConverter(item.ExpenseType),
+
+		
 		};
 	}
 

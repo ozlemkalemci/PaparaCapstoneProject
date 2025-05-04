@@ -14,6 +14,8 @@ public class Expense : BaseEntity
 	public long ExpenseTypeId { get; set; }
 	public ExpenseType ExpenseType { get; set; } = null!;
 
+	public bool Concluded { get; set; }
+
 	public virtual ICollection<ExpenseAttachment> Attachments { get; set; } = new HashSet<ExpenseAttachment>();
 	public ICollection<ExpenseApproval>? Approvals { get; set; } 
 }

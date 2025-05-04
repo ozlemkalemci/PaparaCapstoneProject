@@ -1,21 +1,19 @@
 ﻿@page "/expenses"
 
-@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
 @using Blazored.Toast.Services
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@using System.Reflection
 @using Papara.Wasm.Extensions
 @using Papara.Wasm.Services
 @using Papara.Wasm.Shared.Models
+@using Papara.Wasm.Shared.Models.Expense
 @inject HttpClient Http
 @inject IToastService Toast
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject ConfigurationModel Config
 
-
-<h3>📋 Masraf Listesi</h3>
+<h3>📋 Onay Bekleyen Masraf Listesi</h3>
 
 @if (isLoading)
 {
@@ -32,7 +30,6 @@ else
             <tr>
                 <th>Tarih</th>
                 <th>Tutar</th>
-                <th>Durum</th>
                 <th>Kategori</th>
                 <th>Açıklama</th>
                 <th>Belge</th>
@@ -44,11 +41,10 @@ else
                 <tr>
                     <td>@expense.ExpenseDate.ToString("dd.MM.yyyy")</td>
                     <td>@expense.Amount.ToString("C")</td>
-                    <td>@expense.Status.GetDisplayName()</td>
-                    <td>@expense.ExpenseType</td>
+                    <td>@expense.ResponseExpenseType?.Name</td>
                     <td>@expense.Description</td>
                     <td>
-                        <button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.ExpenseId)">📎 Belge</button>
+                        <button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.Id)">📎 Belge</button>
                     </td>
                 </tr>
             }
@@ -78,12 +74,10 @@ else
 </button>
 
 @code {
-    private List<PersonnelExpenseReportResponse>? expenses;
+    private List<ExpenseResponse>? expenses;
     private bool isLoading = true;
     private string? selectedFileUrl;
     private bool isModalVisible = false;
-
-    private const string FileBaseUrl = "https://localhost:7171/uploads/";
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,12 +88,12 @@ else
 
             if (user.Identity?.IsAuthenticated == true)
             {
-                var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var empIdClaim = user.FindFirst("EmployeeId")?.Value;
 
-                if (!string.IsNullOrEmpty(id) && long.TryParse(id, out var employeeId))
+                if (!string.IsNullOrEmpty(empIdClaim) && long.TryParse(empIdClaim, out var employeeId))
                 {
-                    expenses = await Http.GetFromJsonAsync<List<PersonnelExpenseReportResponse>>(
-                        $"expensereports/personnel-expense-history?EmployeeId={employeeId}");
+                    expenses = await Http.GetFromJsonAsync<List<ExpenseResponse>>(
+                        $"expenses?EmployeeId={employeeId}&IncludeExpenseType=true");
                 }
             }
         }
@@ -123,7 +117,9 @@ else
     {
         try
         {
-            var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>($"expenseattachments?ExpenseId={expenseId}");
+            var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>(
+                $"expenseattachments?ExpenseId={expenseId}");
+
             var file = response?.FirstOrDefault();
 
             if (file != null)
