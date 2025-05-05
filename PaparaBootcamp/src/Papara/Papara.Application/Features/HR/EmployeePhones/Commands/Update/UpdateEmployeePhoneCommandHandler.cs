@@ -34,6 +34,7 @@ public class UpdateEmployeePhoneCommandHandler : IRequestHandler<UpdateEmployeeP
 
 		entity.PhoneNumber = dto.PhoneNumber;
 		entity.IsPrimary = dto.IsPrimary;
+		entity.Type = dto.Type;
 
 		_unitOfWork.Repository<EmployeePhone>().Update(entity);
 		await _unitOfWork.CommitAsync();

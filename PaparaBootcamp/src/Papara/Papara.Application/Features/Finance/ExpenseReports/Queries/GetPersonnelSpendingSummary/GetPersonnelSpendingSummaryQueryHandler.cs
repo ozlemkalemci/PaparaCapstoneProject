@@ -20,7 +20,7 @@ public class GetPersonnelSpendingSummaryQueryHandler : IRequestHandler<GetPerson
 	public async Task<List<PersonnelSpendingSummaryResponse>> Handle(GetPersonnelSpendingSummaryQuery request, CancellationToken cancellationToken)
 	{
 		string sql = "EXEC sp_GetPersonnelSpendingSummary @Period";
-		var result = await _dapperService.QueryAsync<PersonnelSpendingSummaryResponse>(sql, new { Period = request.Period.GetDisplayName().ToLower() });
+		var result = await _dapperService.QueryAsync<PersonnelSpendingSummaryResponse>(sql, new { Period = request.Period.ToString().ToLower() });
 		return result.ToList();
 	}
 }

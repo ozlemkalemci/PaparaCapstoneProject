@@ -1,4 +1,6 @@
-﻿namespace Papara.Wasm.Shared.Models.Expense;
+﻿using Papara.Wasm.Shared.Models.Expense.ExpenseTypes;
+
+namespace Papara.Wasm.Shared.Models.Expense.Expenses;
 
 public class ExpenseResponse
 {

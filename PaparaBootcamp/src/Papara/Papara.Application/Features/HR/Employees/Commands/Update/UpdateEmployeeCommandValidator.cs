@@ -9,8 +9,5 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
 		RuleFor(x => x.Id)
 			.GreaterThan(0).WithMessage("Geçerli bir çalışan ID'si girilmelidir.");
 
-
-		RuleFor(x => x.Request.DepartmentId)
-			.GreaterThan(0).WithMessage("Departman seçilmelidir.");
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel.DataAnnotations;
 
-namespace Papara.Wasm.Shared.Models.Expense;
+namespace Papara.Wasm.Shared.Models.Expense.Expenses;
 
 public class CreateExpenseRequest
 {

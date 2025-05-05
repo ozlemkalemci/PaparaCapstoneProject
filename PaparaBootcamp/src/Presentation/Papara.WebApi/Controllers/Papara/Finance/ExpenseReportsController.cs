@@ -14,10 +14,10 @@ namespace Papara.WebApi.Controllers.Papara.Finance;
 public class ExpenseReportsController : ApiControllerBase
 {
 	/// <summary>
-	/// Belirli bir çalışanın geçmiş masraf işlemlerini getirir.
+	/// Personelin kendi işlem hareketlerini getirir.
 	/// </summary>
 	/// <remarks>
-	/// Personelin kendi harcama geçmişini görmesi için geliştirilmiştir.
+	/// Personelin kendi taleplerini ve detaylarını görebileceği rapordur.
 	/// </remarks>
 	[HttpGet("personnel-expense-history")]
 	public async Task<IActionResult> GetPersonnelExpenseHistory([FromQuery] GetPersonnelExpenseHistoryQuery query)
@@ -27,10 +27,10 @@ public class ExpenseReportsController : ApiControllerBase
 	}
 
 	/// <summary>
-	/// Günlük, haftalık veya aylık toplam masraf özetini getirir.
+	/// Günlük, haftalık ve aylık toplam ödeme özetini getirir.
 	/// </summary>
 	/// <remarks>
-	/// Şirket yönetimi tarafından masraf yoğunluğunu izlemek için kullanılır.
+	/// Şirket yönetimi tarafından toplam ödeme yoğunluğunu izlemek için kullanılır.
 	/// </remarks>
 	[HttpGet("admin-summary")]
 	[Authorize(Roles = "Admin")]
@@ -41,10 +41,10 @@ public class ExpenseReportsController : ApiControllerBase
 	}
 
 	/// <summary>
-	/// Personel bazlı harcama özetlerini (günlük, haftalık, aylık) getirir.
+	/// Personel bazlı günlük, haftalık ve aylık harcama özetlerini getirir.
 	/// </summary>
 	/// <remarks>
-	/// Personellerin harcama yoğunluğunun dönemsel analizini sağlar.
+	/// Şirketin personel bazlı harcama yoğunluğunu dönemsel olarak analiz etmesini sağlar.
 	/// </remarks>
 	[HttpGet("personnel-spending-summary")]
 	[Authorize(Roles = "Admin")]
@@ -55,10 +55,10 @@ public class ExpenseReportsController : ApiControllerBase
 	}
 
 	/// <summary>
-	/// Onay ve red durumlarına göre masraf sayısını ve tutarlarını raporlar.
+	/// Onay ve red durumlarına göre masraf sayı ve tutarlarını getirir.
 	/// </summary>
 	/// <remarks>
-	/// Masraf onay süreçlerinin dönemsel performansını izlemek için kullanılır.
+	/// Günlük, haftalık ve aylık dönemlerde masraf onay/red istatistiklerini raporlamak için kullanılır.
 	/// </remarks>
 	[HttpGet("approval-status-summary")]
 	[Authorize(Roles = "Admin")]
@@ -67,4 +67,5 @@ public class ExpenseReportsController : ApiControllerBase
 		var result = await Mediator.Send(query);
 		return Ok(result);
 	}
+
 }

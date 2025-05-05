@@ -26,9 +26,10 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
 		var filter = (Expression<Func<Employee, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Employee, object>>>();
 		var currentEmpId = _userContextService.GetCurrentEmployeeId();
-		var currentUserRole = _userContextService.GetCurrentUserRole();
+		string currentUserRole = _userContextService.GetCurrentUserRole();
+		string empRole = UserRole.Employee.ToString();
 
-		if (currentEmpId > 0 && currentUserRole == UserRole.Employee.GetDisplayName())
+		if (currentEmpId > 0 && currentUserRole == empRole)
 		{
 			filter = filter.And(x => x.Id == currentEmpId);
 		}

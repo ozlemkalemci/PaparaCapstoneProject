@@ -20,7 +20,7 @@ public class GetAdminExpenseSummaryReportQueryHandler : IRequestHandler<GetAdmin
 	public async Task<List<AdminExpenseSummaryResponse>> Handle(GetAdminExpenseSummaryReportQuery request, CancellationToken cancellationToken)
 	{
 		string sql = "EXEC sp_GetAdminExpenseSummaryReport @Period";
-		var result = await _dapperService.QueryAsync<AdminExpenseSummaryResponse>(sql, new { Period = request.Period.GetDisplayName().ToLower() });
+		var result = await _dapperService.QueryAsync<AdminExpenseSummaryResponse>(sql, new { Period = request.Period.ToString().ToLower() });
 		return result.ToList();
 	}
 

@@ -1,0 +1,82 @@
+﻿@page "/reports/personnel-spending-summary"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
+@using Blazored.Toast.Services
+@using Papara.Wasm.Extensions
+@using Papara.Wasm.Shared.Models.Expense.Reports
+@inject HttpClient Http
+@inject IToastService Toast
+
+<h3 class="mb-4">👥 Personel Bazlı Harcama Yoğunluğu</h3>
+
+<div class="mb-3">
+    <label>Dönem:</label>
+    <select class="form-select" @bind="selectedPeriod">
+        @foreach (ReportPeriod period in Enum.GetValues(typeof(ReportPeriod)))
+        {
+            <option value="@period">@period.GetDisplayName()</option>
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary mb-3" @onclick="LoadData">📊 Raporu Getir</button>
+
+@if (isLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else if (summaryList?.Any() != true)
+{
+    <p>Veri bulunamadı.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Dönem</th>
+                <th>Ad Soyad</th>
+                <th>Toplam Tutar</th>
+                <th>Masraf Sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in summaryList)
+            {
+                <tr>
+                    <td>@item.Period.GetDisplayName()</td>
+                    <td>@item.FullName</td>
+                    <td>@item.TotalAmount.ToString("C")</td>
+                    <td>@item.ExpenseCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = false;
+    private ReportPeriod selectedPeriod = ReportPeriod.Daily;
+    private List<PersonnelSpendingSummaryResponse>? summaryList;
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+
+        try
+        {
+            var url = $"expensereports/personnel-spending-summary?Period={selectedPeriod}";
+            summaryList = await Http.GetFromJsonAsync<List<PersonnelSpendingSummaryResponse>>(url);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Rapor verileri alınırken hata oluştu: " + ex.Message);
+            Toast.ShowError("Rapor yüklenemedi.");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
