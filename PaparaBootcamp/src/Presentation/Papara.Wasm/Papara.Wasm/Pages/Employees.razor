@@ -1,0 +1,512 @@
+﻿@page "/employee/profile"
+
+@using System.Security.Claims
+@using Blazored.Toast.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Extensions
+@using Papara.Wasm.Services
+@using Papara.Wasm.Shared.Models
+@using Papara.Wasm.Shared.Models.Expense
+@using Papara.Wasm.Shared.Models.Expense.EmployeeAddresses
+@using Papara.Wasm.Shared.Models.Expense.EmployeePhones
+@using Papara.Wasm.Shared.Models.Expense.Employees
+@inject HttpClient Http
+@inject IToastService Toast
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject ConfigurationModel Config
+
+<h3>👷 Personel Bilgileri</h3>
+
+@if (isLoading)
+{
+	<p>Yükleniyor...</p>
+}
+else if (employees == null || !employees.Any())
+{
+	<p>Hiç personel bulunamadı.</p>
+}
+else
+{
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Ad Soyad</th>
+				<th>T.C. No</th>
+				<th>IBAN</th>
+				<th>Departman</th>
+				<th>Adres Bilgileri</th>
+				<th>Telefon Bilgileri</th>
+				@if (userRole == "Admin")
+				{
+					<th>İşlemler</th>
+				}
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var emp in employees)
+			{
+				<tr>
+					<td>@GetFullName(emp)</td>
+					<td>@emp.IdentityNumber</td>
+					<td>@emp.IBAN</td>
+					<td>@emp.ResponseDepartment?.DepartmentName</td>
+					<td>
+						<button class="btn btn-sm btn-info me-2" @onclick="() => ToggleAddress(emp.Id)">
+							@(SelectedAddressEmpId == emp.Id ? "Gizle" : "Göster")
+						</button>
+					</td>
+					<td>
+						<button class="btn btn-sm btn-secondary" @onclick="() => TogglePhone(emp.Id)">
+							@(SelectedPhoneEmpId == emp.Id ? "Gizle" : "Göster")
+						</button>
+					</td>
+					@if (userRole == "Admin")
+					{
+						<td>
+							@if (emp.UserId == null)
+							{
+								<button class="btn btn-sm btn-outline-primary"
+								@onclick="@(() => NavigateToCreateUser(emp.Id))">
+									➕ Kullanıcı Oluştur
+								</button>
+							}
+							else
+							{
+								<span class="text-muted">Bağlı Kullanıcı Oluşturuldu </span>
+							}
+						</td>
+					}
+				</tr>
+
+				@if (SelectedAddressEmpId == emp.Id)
+				{
+					<tr>
+						<td colspan="7">
+							@if (addressList != null && addressList.Any())
+							{
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr>
+											<th>Şehir</th>
+											<th>İlçe</th>
+											<th>Detay</th>
+											@if (userRole == "Admin")
+											{
+												<th>İşlemler</th>
+											}
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var addr in addressList)
+										{
+											<tr>
+												<td>@addr.City</td>
+												<td>@addr.District</td>
+												<td>@addr.Detail</td>
+												@if (userRole == "Admin")
+												{
+													<td>
+														<button class="btn btn-sm btn-warning" @onclick="() => EditAddress(addr.Id)">Düzenle</button>
+														<button class="btn btn-sm btn-danger ms-1" @onclick="() => DeleteAddress(addr.Id)">Sil</button>
+													</td>
+												}
+											</tr>
+										}
+									</tbody>
+								</table>
+							}
+							@if (userRole == "Admin")
+							{
+								<button class="btn btn-success mt-2" @onclick="() => ShowAddressModal(emp.Id)">➕ Adres Ekle</button>
+							}
+						</td>
+					</tr>
+				}
+
+				@if (SelectedPhoneEmpId == emp.Id)
+				{
+					<tr>
+						<td colspan="7">
+							@if (phoneList != null && phoneList.Any())
+							{
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr>
+											<th>Tür</th>
+											<th>Numara</th>
+											<th>Öncelik Durumu</th>
+											@if (userRole == "Admin")
+											{
+												<th>İşlemler</th>
+											}
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var phone in phoneList)
+										{
+											<tr>
+												<td>@phone.Type.GetDisplayName()</td>
+												<td>@phone.PhoneNumber</td>
+												<td>
+													@if (phone.IsPrimary)
+													{
+														<span class="badge bg-primary">Birincil</span>
+													}
+													else
+													{
+														<span class="badge bg-secondary">-</span>
+													}
+												</td>
+												@if (userRole == "Admin")
+												{
+													<td>
+														<button class="btn btn-sm btn-warning" @onclick="() => EditPhone(phone.Id)">Düzenle</button>
+														<button class="btn btn-sm btn-danger ms-1" @onclick="() => DeletePhone(phone.Id)">Sil</button>
+													</td>
+												}
+											</tr>
+										}
+									</tbody>
+								</table>
+							}
+							@if (userRole == "Admin")
+							{
+								<button class="btn btn-success mt-2" @onclick="() => ShowPhoneModal(emp.Id)">➕ Telefon Ekle</button>
+							}
+						</td>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+}
+
+
+@if (isAddressModalVisible)
+{
+	<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">@((editingAddressId > 0) ? "Adres Güncelle" : "Yeni Adres")</h5>
+					<button type="button" class="btn-close" @onclick="() => isAddressModalVisible = false"></button>
+				</div>
+				<div class="modal-body">
+					<EditForm Model="@(editingAddressId > 0 ? updateAddress : newAddress)" OnValidSubmit="HandleAddAddress">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						@if (editingAddressId > 0)
+						{
+							<InputText class="form-control mb-2" placeholder="Şehir" @bind-Value="updateAddress.City" />
+							<InputText class="form-control mb-2" placeholder="İlçe" @bind-Value="updateAddress.District" />
+							<InputTextArea class="form-control mb-2" placeholder="Detay" @bind-Value="updateAddress.Detail" />
+						}
+						else
+						{
+							<InputText class="form-control mb-2" placeholder="Şehir" @bind-Value="newAddress.City" />
+							<InputText class="form-control mb-2" placeholder="İlçe" @bind-Value="newAddress.District" />
+							<InputTextArea class="form-control mb-2" placeholder="Detay" @bind-Value="newAddress.Detail" />
+						}
+
+						<button class="btn btn-success">Kaydet</button>
+					</EditForm>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@if (isPhoneModalVisible)
+{
+	<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Telefon</h5>
+					<button type="button" class="btn-close" @onclick="() => isPhoneModalVisible = false"></button>
+				</div>
+				<div class="modal-body">
+					<EditForm Model="@(editingPhoneId > 0 ? updatePhone : newPhone)" OnValidSubmit="HandleAddPhone">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						@if (editingPhoneId > 0)
+						{
+							<InputText class="form-control mb-2" placeholder="Telefon Numarası"
+							@bind-Value="updatePhone.PhoneNumber"
+							pattern="[5]{1}[0-9]{9}"
+							title="Başında '0' olmadan 10 haneli olmalı (5XXXXXXXXX)" />
+
+							<InputCheckbox @bind-Value="updatePhone.IsPrimary" /> <label class="ms-1">Birincil Telefon</label>
+
+							<InputSelect class="form-control mb-2" @bind-Value="updatePhone.Type">
+								@foreach (PhoneType type in Enum.GetValues(typeof(PhoneType)))
+								{
+									<option value="@type">@type.GetDisplayName()</option>
+								}
+							</InputSelect>
+						}
+						else
+						{
+							<InputText class="form-control mb-2" placeholder="Telefon Numarası"
+							@bind-Value="newPhone.PhoneNumber"
+							pattern="[5]{1}[0-9]{9}"
+							title="Başında '0' olmadan 10 haneli olmalı (5XXXXXXXXX)" />
+
+							<InputCheckbox @bind-Value="newPhone.IsPrimary" /> <label class="ms-1">Birincil Telefon</label>
+
+							<InputSelect class="form-control mb-2" @bind-Value="newPhone.Type">
+								@foreach (PhoneType type in Enum.GetValues(typeof(PhoneType)))
+								{
+									<option value="@type">@type.GetDisplayName()</option>
+								}
+							</InputSelect>
+						}
+
+						<button class="btn btn-success">Kaydet</button>
+					</EditForm>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	private List<EmployeeResponse>? employees;
+	private List<EmployeeAddressResponse>? addressList;
+	private List<EmployeePhoneResponse>? phoneList;
+
+	private string? userRole;
+
+	private long SelectedAddressEmpId = 0;
+	private long SelectedPhoneEmpId = 0;
+	private long editingPhoneId;
+	private long editingAddressId;
+
+	private bool isLoading = true;
+
+	private bool isAddressModalVisible = false;
+	private bool isPhoneModalVisible = false;
+
+	private CreateEmployeeAddressRequest newAddress = new();
+	private CreateEmployeePhoneRequest newPhone = new();
+	private UpdateEmployeePhoneRequest updatePhone = new();
+	private UpdateEmployeeAddressRequest updateAddress = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			var authState = await AuthProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			if (user.Identity?.IsAuthenticated == true)
+			{
+				userRole = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+				employees = await Http.GetFromJsonAsync<List<EmployeeResponse>>("employees?IncludeDepartment=true");
+			}
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError("Personel listesi yüklenemedi.");
+			Console.Error.WriteLine(ex);
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+	private string GetFullName(EmployeeResponse emp) =>
+		string.IsNullOrWhiteSpace(emp.MiddleName) ?
+		$"{emp.FirstName} {emp.LastName}" :
+		$"{emp.FirstName} {emp.MiddleName} {emp.LastName}";
+
+	private async Task ToggleAddress(long empId)
+	{
+		if (SelectedAddressEmpId == empId)
+		{
+			SelectedAddressEmpId = 0;
+			addressList = new();
+			return;
+		}
+
+		SelectedAddressEmpId = empId;
+		newAddress = new CreateEmployeeAddressRequest { EmployeeId = empId };
+		addressList = await Http.GetFromJsonAsync<List<EmployeeAddressResponse>>($"employeeaddresses?EmployeeId={empId}");
+	}
+
+	private async Task TogglePhone(long empId)
+	{
+		if (SelectedPhoneEmpId == empId)
+		{
+			SelectedPhoneEmpId = 0;
+			phoneList = new();
+			return;
+		}
+
+		SelectedPhoneEmpId = empId;
+		newPhone = new CreateEmployeePhoneRequest { EmployeeId = empId };
+		phoneList = await Http.GetFromJsonAsync<List<EmployeePhoneResponse>>($"employeephones?EmployeeId={empId}");
+	}
+
+	private void ShowAddressModal(long empId)
+	{
+		editingAddressId = 0;
+		isAddressModalVisible = true;
+		newAddress = new CreateEmployeeAddressRequest { EmployeeId = empId };
+	}
+
+	private void ShowPhoneModal(long empId)
+	{
+		editingPhoneId = 0;
+		isPhoneModalVisible = true;
+		newPhone = new CreateEmployeePhoneRequest { EmployeeId = empId };
+	}
+
+	private async Task HandleAddAddress()
+	{
+		HttpResponseMessage response;
+		if (editingAddressId > 0)
+		{
+			response = await Http.PutAsJsonAsync($"employeeaddresses/{editingAddressId}", updateAddress);
+			editingAddressId = 0;
+			if (response.IsSuccessStatusCode)
+				Toast.ShowSuccess("Adres güncellendi.");
+		}
+		else
+		{
+			response = await Http.PostAsJsonAsync("employeeaddresses", newAddress);
+			if (response.IsSuccessStatusCode)
+				Toast.ShowSuccess("Adres eklendi.");
+		}
+
+		if (response.IsSuccessStatusCode)
+		{
+			isAddressModalVisible = false;
+			await ToggleAddress(newAddress.EmployeeId);
+		}
+		else
+		{
+			Toast.ShowError("Adres kaydedilemedi.");
+		}
+	}
+
+
+	private async Task HandleAddPhone()
+	{
+		HttpResponseMessage response;
+		if (editingPhoneId > 0)
+		{
+			response = await Http.PutAsJsonAsync($"employeephones/{editingPhoneId}", updatePhone);
+			editingPhoneId = 0;
+		}
+		else
+		{
+			response = await Http.PostAsJsonAsync("employeephones", newPhone);
+		}
+		if (response.IsSuccessStatusCode)
+		{
+			Toast.ShowSuccess("Telefon eklendi.");
+			isPhoneModalVisible = false;
+			await TogglePhone(newPhone.EmployeeId);
+		}
+		else
+		{
+			Toast.ShowError("Telefon eklenemedi.");
+		}
+	}
+
+	private async Task EditAddress(long id)
+	{
+		try
+		{
+			var result = await Http.GetFromJsonAsync<EmployeeAddressResponse>($"employeeaddresses/{id}");
+			if (result is not null)
+			{
+				updateAddress = new UpdateEmployeeAddressRequest
+					{
+						City = result.City,
+						District = result.District,
+						Detail = result.Detail
+					};
+				editingAddressId = id;
+				isAddressModalVisible = true;
+			}
+			else
+			{
+				Toast.ShowError("Adres bilgisi getirilemedi.");
+			}
+		}
+		catch (Exception)
+		{
+			Toast.ShowError("Adres düzenleme hatası.");
+		}
+	}
+
+
+
+	private async Task DeleteAddress(long id)
+	{
+		var result = await Http.DeleteAsync($"employeeaddresses/{id}");
+		if (result.IsSuccessStatusCode)
+		{
+			Toast.ShowSuccess("Adres silindi.");
+			await ToggleAddress(SelectedAddressEmpId);
+		}
+		else
+		{
+			Toast.ShowError("Adres silinemedi.");
+		}
+	}
+
+	private async Task EditPhone(long id)
+	{
+		try
+		{
+			var result = await Http.GetFromJsonAsync<EmployeePhoneResponse>($"employeephones/{id}");
+			if (result is not null)
+			{
+				updatePhone = new UpdateEmployeePhoneRequest
+					{
+						PhoneNumber = result.PhoneNumber,
+						IsPrimary = result.IsPrimary,
+						Type = result.Type
+					};
+				editingPhoneId = id;
+				isPhoneModalVisible = true;
+			}
+			else
+			{
+				Toast.ShowError("Telefon bilgisi getirilemedi.");
+			}
+		}
+		catch (Exception)
+		{
+
+			throw;
+		}
+	}
+
+	private async Task DeletePhone(long id)
+	{
+		var result = await Http.DeleteAsync($"employeephones/{id}");
+		if (result.IsSuccessStatusCode)
+		{
+			Toast.ShowSuccess("Telefon silindi.");
+			await TogglePhone(SelectedPhoneEmpId);
+		}
+		else
+		{
+			Toast.ShowError("Telefon silinemedi.");
+		}
+	}
+
+	private void NavigateToCreateUser(long employeeId)
+	{
+		Navigation.NavigateTo($"/employee/create-user/{employeeId}");
+	}
+}

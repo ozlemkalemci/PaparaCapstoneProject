@@ -22,7 +22,7 @@ public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, L
 
 	public async Task<List<ExpenseResponse>> Handle(GetAllExpensesQuery request, CancellationToken cancellationToken)
 	{
-		var filter = (Expression<Func<Expense, bool>>)(x => x.IsActive && x.Concluded);
+		var filter = (Expression<Func<Expense, bool>>)(x => x.IsActive && x.Concluded == false);
 		var includes = new List<Expression<Func<Expense, object>>>();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 

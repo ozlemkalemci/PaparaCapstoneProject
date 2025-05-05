@@ -23,10 +23,10 @@ public class EmployeesController : ApiControllerBase
 	}
 
 	/// <summary>
-	/// Tüm çalışanları listeler. Yalnızca admin yetkilidir.
+	/// Tüm çalışanları listeler. Yalnızca admin tüm personeli görüntülemeye yetkilidir. Employee sadece kendisini görür.
 	/// </summary>
 	[HttpGet]
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "Admin,Employee")]
 	public async Task<IActionResult> GetAll([FromQuery] GetEmployeeRequest request)
 	{
 		var result = await Mediator.Send(new GetAllEmployeesQuery(request));

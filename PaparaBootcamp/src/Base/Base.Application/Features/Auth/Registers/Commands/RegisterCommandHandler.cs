@@ -39,6 +39,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 			Role = dto.Role,
 			OpenDate = DateTimeOffset.UtcNow,
 			IsActive = true,
+			Email = dto.Email,
 			CreatedDate = DateTimeOffset.UtcNow,
 			CreatedById = 0 // sıfır demek bu kullanıcıyı sistem otomatik olarak oluşturdu, yani oluşturan başka bir kullanıcı yok demek
 		};

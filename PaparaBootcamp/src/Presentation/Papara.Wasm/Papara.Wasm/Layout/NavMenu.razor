@@ -20,16 +20,13 @@
 			<ul class="sidebar-menu">
 				@if (userRole == "Employee")
 				{
-					<li><NavLink href="/employee/profile" class="sidebar-link" activeClass="active">🧑 Profil</NavLink></li>
+					<li><NavLink href="/employee/profile" class="sidebar-link" activeClass="active">🧑 Profilim</NavLink></li>
 				}
 
-				<li><NavLink href="/employee/address" class="sidebar-link" activeClass="active">🏠 Adres Bilgileri</NavLink></li>
-				<li><NavLink href="/employee/phone" class="sidebar-link" activeClass="active">📞 Telefon Bilgileri</NavLink></li>
 
 				@if (userRole == "Admin")
 				{
 					<li><NavLink href="/employee/profile" class="sidebar-link" activeClass="active">🧑 Personeller </NavLink></li>
-					<li><NavLink href="/employee/create-user" class="sidebar-link" activeClass="active">➕ Kullanıcı Oluştur</NavLink></li>
 					<li><NavLink href="/employee/create-employee" class="sidebar-link" activeClass="active">👷 Personel Oluştur</NavLink></li>
 				}
 
@@ -57,13 +54,14 @@
 			<ul class="sidebar-menu">
 				@if (userRole == "Employee")
 				{
-					<li><NavLink href="/reports/personnel-expense-history" class="sidebar-link">📄 Harcama Geçmişim</NavLink></li>
+					<li><NavLink href="/reports/personnel-expense-history" class="sidebar-link">📄 Masraf Geçmişim</NavLink></li>
 				}
 				@if (userRole == "Admin")
 				{
-					<li><NavLink href="/reports/admin-summary" class="sidebar-link">🧾 Masraf Özeti</NavLink></li>
-					<li><NavLink href="/reports/personnel-spending-summary" class="sidebar-link">👥 Personel Harcama</NavLink></li>
-					<li><NavLink href="/reports/approval-status-summary" class="sidebar-link">✅ Onay/Red Durumu</NavLink></li>
+					<li><NavLink href="/reports/personnel-spending-summary" class="sidebar-link">👥 Personel Masraf Yoğunluğu</NavLink></li>
+					<li><NavLink href="/reports/personnel-expense-history-admin" class="sidebar-link">📄 Personel Masraf Geçmişi</NavLink></li>
+					<li><NavLink href="/reports/approval-status-summary" class="sidebar-link">📊 Onay/Red Masraf Miktarları</NavLink></li>
+					<li><NavLink href="/reports/admin-summary" class="sidebar-link">🧾 Toplam Masraf Yoğunluğu</NavLink></li>
 				}
 			</ul>
 		}

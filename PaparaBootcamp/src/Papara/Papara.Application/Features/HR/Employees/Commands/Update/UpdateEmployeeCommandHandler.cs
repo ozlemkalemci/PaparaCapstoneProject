@@ -26,7 +26,6 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
 
 		var dto = request.Request;
 
-		entity.DepartmentId = dto.DepartmentId;
 		entity.UserId = dto.UserId;
 
 		_unitOfWork.Repository<Employee>().Update(entity);

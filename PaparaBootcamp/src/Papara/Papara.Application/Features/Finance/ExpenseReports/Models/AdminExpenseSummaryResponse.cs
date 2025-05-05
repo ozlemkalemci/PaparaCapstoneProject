@@ -1,4 +1,5 @@
 ﻿using Papara.Domain.Enums.Finance;
+using System.ComponentModel.DataAnnotations;
 
 namespace Papara.Application.Features.Finance.ExpenseReports.Models;
 

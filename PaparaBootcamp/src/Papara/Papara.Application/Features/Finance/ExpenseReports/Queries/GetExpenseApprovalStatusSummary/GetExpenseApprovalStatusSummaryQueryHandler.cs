@@ -20,7 +20,7 @@ public class GetExpenseApprovalStatusSummaryQueryHandler : IRequestHandler<GetEx
 	public async Task<List<ExpenseApprovalStatusSummaryResponse>> Handle(GetExpenseApprovalStatusSummaryQuery request, CancellationToken cancellationToken)
 	{
 		string sql = "EXEC sp_GetExpenseApprovalStatusSummary @Period";
-		var result = await _dapperService.QueryAsync<ExpenseApprovalStatusSummaryResponse>(sql, new { Period = request.Period.GetDisplayName().ToLower() });
+		var result = await _dapperService.QueryAsync<ExpenseApprovalStatusSummaryResponse>(sql, new { Period = request.Period.ToString().ToLower() });
 		return result.ToList();
 	}
 }
