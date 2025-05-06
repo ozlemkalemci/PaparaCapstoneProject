@@ -6,8 +6,6 @@
 Bitirme Projesi
   </h3>
 <br/>
-<br/>
-<br/>
 
 https://github.com/user-attachments/assets/87e1e194-7a44-4dec-84e2-664d44ba14b1
 
