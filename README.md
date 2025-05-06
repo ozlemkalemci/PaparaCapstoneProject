@@ -1,9 +1,25 @@
-# 📘 Papara Masraf Yönetim Sistemi – Backend API
+<a name="readme-top"></a>
+<h2 align="center">
+📘 Papara Masraf Yönetim Sistemi – Fullstack (Backend + Frontend)
+</h2>
+<h3 align="center">
+Bitirme Projesi
+  </h3>
+<br/>
 
-Bu proje, bir şirket bünyesinde sahada çalışan personelin masraflarını yönetebilmesi, yöneticilerin bu masrafları onaylayıp banka simülasyonu üzerinden ödeme yapabilmesi amacıyla geliştirilmiş modüler bir .NET 8 Web API çözümüdür.
+https://github.com/user-attachments/assets/87e1e194-7a44-4dec-84e2-664d44ba14b1
+
+
+---
+# Proje Hakkında
+
+Bu proje, bir şirket bünyesinde sahada çalışan personelin masraflarını yönetebilmesi, yöneticilerin bu masrafları onaylayıp **banka simülasyonu** üzerinden ödeme yapabilmesi amacıyla geliştirilmiş **modüler**, **güvenli** ve **dokümente edilmiş** bir **.NET 8 Web API** + **Blazor WebAssembly** çözümüdür. Proje amacı, sahada çalışan personelin masraf taleplerini hızlıca sisteme girmesini, yöneticilerin bu talepleri değerlendirmesini ve onaylanan talepler için **banka simülasyonu aracılığıyla otomatik ödeme** yapılmasını sağlar. Amaç, manuel fiş toplama süreçlerini dijitalleştirerek hem çalışan hem yönetici verimliliğini artırmaktır.
+
+---
 
 ## 🔧 Teknoloji Yığını
 
+### Backend
 - .NET 8 Web API
 - Entity Framework Core (Code First)
 - MediatR + CQRS + FluentValidation
@@ -13,170 +29,225 @@ Bu proje, bir şirket bünyesinde sahada çalışan personelin masraflarını y�
 - Swagger / Postman
 - Stored Procedure & View
 
-## 🔐 Kimlik Doğrulama
+### Frontend
+- Blazor WebAssembly
+- JWT Token + LocalStorage
+- Blazored.Toast + Blazored.LocalStorage
+- Role-based authorization
+- Responsive, sade tasarım
 
-- JWT + Refresh Token
-- Redis ile token blacklist kontrolü
-- Giriş (/api/auth/login) sonrası accessToken, bearerToken değişkenine otomatik olarak aktarılır
-- Tüm yetkili isteklerde şu header kullanılmalıdır:
+---
 
-```http
-Authorization: Bearer {{bearerToken}}
+
+## ⚙️ Kurulum
+
+### 1. Redis Gereksinimi
+Redis bağlantısı aktif olmalıdır.
+
+```bash
+docker run -p 6379:6379 redis
 ```
 
-- Token süresi dolduğunda /api/auth/refresh-token ile yenilenir.
+### 2. appsettings.json Ayarları
 
-## ⚙️ Kurulum Bilgisi
-
-Redis bağlantısı açık olmalıdır. `appsettings.json` dosyasına aşağıdaki ayarları eklemeyi ve ConnectionStringlerinizi düzenlemeyi unutmayın:
-
+Kullanılan connection ayarları appsettings.json klasöründe düzenlenmelidir
 ```json
 "ConnectionStrings": {
   "PaparaSqlConnection": "Server=YOUR_SERVER;Initial Catalog=PaparaDb;Integrated Security=true;TrustServerCertificate=True;",
   "BankSqlConnection": "Server=YOUR_SERVER;Initial Catalog=BankDb;Integrated Security=true;TrustServerCertificate=True;"
 },
-
 "RedisConnection": "localhost:6379"
-
 ```
 
-> Redis ayağa kaldırmak için:
-```bash
-docker run -p 6379:6379 redis
-```
+---
 
 ## 🧱 Migration Komutları
 
-Yeni migration eklemek için:
-
+Projede migration işlemleri aşağıdaki komutlarla yapılmıştır:
 ```bash
 dotnet ef migrations add InitialCreate_App --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context AppDbContext --output-dir Migrations/Papara
 dotnet ef migrations add InitialCreate_Bank --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context BankDbContext --output-dir Migrations/Bank
 ```
-
-Veritabanına migrationları uygulamak için:
-
+Projeyi klonlayan kişinin ise migrationları şu komutlar ile update etmesi gerekmektedir:
 ```bash
 dotnet ef database update --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context AppDbContext
 dotnet ef database update --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context BankDbContext
 ```
 
-> 📌 Bu işlemler sonrası **Stored Procedure** ve **View** otomatik oluşturulacaktır.
+> Stored Procedure ve View yapıları da migration içinde yer alır.
+
+---
 
 ## 🚀 Uygulama Başlatma
+### 1. WebAPI ve Blazor projelerini birlikte çalıştırmak için:
+Visual Studio’da Configure Startup Projects > Multiple Startup Projects seçeneğini aktif edin.
+Papara.WebApi ve Papara.Wasm projelerini Start olarak işaretleyin.
 
+### 2. Komutla başlatmak için:
+#### Backend
 ```bash
 cd src/Presentation/Papara.WebApi
 dotnet run
 ```
 
-## 📘 Swagger Arayüzü
-
-[http://localhost:7171/swagger](http://localhost:7171/swagger)
-
-## 📬 Postman Kullanımı
-
-- `docs/Papara.postman_collection.json` dosyasını Postman’e import edin
-- Ortam değişkeni olarak `{{baseUrl}} = https://localhost:7171` tanımlayın
-- `Auth > Login` ile giriş yapın
-- Token otomatik olarak `bearerToken` değişkenine yazılır
-
-## 🧩 Modüller
-
-### 🔑 Auth
-- `POST /api/auth/login`
-- `POST /api/auth/register`
-- `POST /api/auth/logout`
-- `POST /api/auth/refresh-token`
-
-### 👤 Kullanıcı Yönetimi
-- Çalışanlar: `GET/POST/PUT/DELETE /api/employees`
-- Adresler: `.../employeeaddresses`
-- Telefonlar: `.../employeephones`
-- Departmanlar: `.../departments`
-
-### 💰 Masraf Yönetimi
-- Masraflar: `.../expenses`
-- Masraf Türleri: `.../expensetypes`
-- Dosya Eki: `.../expenseattachments`
-
-### ✔️ Masraf Onay / Red
-- Onay: `POST /api/expense-approvals`
-- Red: `POST /api/expense-approvals/revert/{id}`
-
-### 🏦 Banka Simülasyonu
-- Masraf onayı sonrası otomatik simülasyon ile ödeme yapılır (`BankDbContext`)
-- Ödeme detayları `ExpensePayment` tablosunda tutulur
-
-### 📊 Raporlama (Dapper + SP + View)
-
-#### API Endpoint’leri:
-
-- `GET /api/reports/personnel-history?employeeId=3` → Personelin kendi geçmiş harcamaları
-- `GET /api/reports/admin-summary?period=monthly` → Günlük / Haftalık / Aylık harcama toplamı
-- `GET /api/reports/personnel-summary?period=weekly` → Personel bazlı harcama özeti
-- `GET /api/reports/approval-status-summary?period=daily` → Onay/red bazlı özet
-
-#### Teknik Yapılar:
-- `vw_PersonnelExpenseHistory` – View
-- `sp_GetAdminExpenseSummaryReport` – SP
-- `sp_GetPersonnelSpendingSummary` – SP
-- `sp_GetExpenseApprovalStatusSummary` – SP
-
-## 🧪 Test Senaryoları
-
-- Personel login olur → Masraf girer → Dosya yükler
-- Admin login olur → Masrafı onaylar → Ödeme yapılır
-- Raporlar kontrol edilir (Dapper SP + View üzerinden)
-
-## 👤 Seed Kullanıcılar
-
-### 👨‍💼 Admin
-- Kullanıcı Adı: `admin`
-- Şifre: `admin123`
-
-### 👷‍♂️ Personel
-- Kullanıcı Adı: `personel1`
-- Şifre: `personel123`
-
-## 🗂️ Dosya Sistemi
-
-```text
-├── Base
-│   ├── Application
-│   ├── Infrastructure
-│   ├── Persistence
-├── Papara
-│   ├── Application
-│   ├── Domain
-├── src
-│   └── Presentation
-│       └── Papara.WebApi
-├── docs
-│   └── Papara.postman_collection.json
+#### Frontend
+```bash
+cd src/Presentation/Papara.Wasm
+dotnet run
 ```
 
-## 👥 Rollere Göre Yetkilendirme
+> Giriş sonrası kullanıcıya özel içerik, sidebar ve yetkili işlemler görünür.
 
-| Modül                    | Admin     | Employee  |
-|--------------------------|-----------|-----------|
-| Auth (Login/Register)    | ✅        | ✅        |
-| Department CRUD          | ✅        | ❌        |
-| Employee CRUD            | ✅        | Kendi     |
-| Expenses CRUD            | ✅        | Kendi     |
-| Attachments              | ✅        | Kendi     |
-| Approvals                | ✅        | ❌        |
-| Bank Payment             | ✅        | ❌        |
-| Reports                  | ✅        | Kendi     |
+---
 
-## 📎 Ekstra Bilgiler
+## 📘 Swagger Arayüzü
+[http://localhost:7171/swagger](http://localhost:7171/swagger)
 
-- Dosyalar `UploadedFiles/` klasörüne kaydedilir (varsa .gitignore’dan çıkarılmalı)
-- Enum’lar `GetDisplayName()` ile metinsel gösterime çevrilir
-- Validasyon hataları 400 dönülür, global exception handler yapılandırılmıştır
+## 📬 Postman
+- `docs/Papara.postman_collection.json` dosyasını import edin
+- `{{baseUrl}} = https://localhost:7171`
 
-## 👨‍💻 Geliştirici Bilgisi
+---
 
+## 🔐 Kimlik Doğrulama
+- JWT + Refresh Token + Redis Blacklist
+- `Authorization: Bearer {{bearerToken}}`
+
+---
+
+## 🧩️ Ödeme Mantığı – IBAN Eşleme
+- Masraf talebi onaylandığı anda, **ilgili personele banka simülasyonu servisi ile otomatik ödeme** yapılır.
+- Bunun için personelin **IBAN bilgisi ile birebir eşleşen bir `BankAccount`** oluşturulması gerekir.
+- Bu işlem frontend tarafından yapılmaz; çünkü şirketin masraf yönetimi ile banka tarafı ayrı işlerdir.
+- Swagger veya Postman kullanarak `/api/bankaccounts` endpoint'i üzerinden IBAN'a sahip hesap açılmalıdır.
+
+---
+
+## 📉 Modüler
+
+### 🔑 Auth
+- Login, Register, Refresh
+
+### 👤 Kullanıcı Yönetimi
+- Employee, Phone, Address, Department CRUD
+
+### 💰 Masraf Yönetimi
+- Expense CRUD, Attachments, Expense Types
+
+### ✔️ Onaylama / Red
+- Expense Approvals + Red Açıklama
+
+### 🏦 Banka Simülasyonu
+- Approval sonrası otomatik ödeme işlemi
+- BankDbContext + ExpensePayment
+- Banka hesabı (IBAN) Swagger ya da Postman ile açılmalıdır
+
+### 📊 Raporlama
+- Admin & Personel için SP + View üzerinden 4 farklı rapor
+
+---
+
+## 📊 Rapor Endpointleri
+- `/api/reports/personnel-history`
+- `/api/reports/admin-summary`
+- `/api/reports/personnel-summary`
+- `/api/reports/approval-status-summary`
+
+---
+
+## 🧰 Test Senaryoları
+- Personel giriş yapar → masraf girer → belge yükler
+- Admin giriş yapar → talepleri onaylar/red eder → banka simülasyonu
+- Raporlar filtrelenerek incelenir
+
+---
+
+## 🧑‍💼 Rollere Göre Yetki
+| Modül                  | Admin | Employee |
+|------------------------|--------|----------|
+| Auth                   | ✅     | ✅        |
+| Employee CRUD          | ✅     | Kendi     |
+| Department CRUD        | ✅     | ❌        |
+| Expense CRUD           | ✅     | Kendi     |
+| Approvals              | ✅     | ❌        |
+| Attachments            | ✅     | Kendi     |
+| Reports                | ✅     | Kendi     |
+| Bank Payment           | ✅     | ❌        |
+
+---
+
+## 👤 Seed Kullanıcılar ve Varsayılan Veriler
+
+**Kullanıcılar:**
+- `admin` / `admin123`
+- `ozlem.kalemci` / `Ozlem123`
+- `personel1` / `personel123`
+
+**BankAccount:**
+- Papara Şirketi (Kurumsal) → `TR...999`
+- Özlem Kalemci (Bireysel) → `TR...001`
+- Personel Personel (Bireysel) → `TR...002`
+
+**Company:**
+- Papara Şirketi (Vergi No: 1234567890)
+
+**Department:**
+- Yönetim, Operasyon, Finans, Yazılım Geliştirme
+
+**ExpenseType:**
+- Ulaşım, Yemek, Sağlık, Konaklama vb. 9 farklı gider tipi
+
+**Employee:**
+- Admin, Özlem Kalemci ve Personel’e ait 3 kayıt
+- Adres ve telefon bilgileri dahil
+
+---
+
+## 📂 Proje Yapısı
+
+![d-removebg-preview (2)](https://github.com/user-attachments/assets/142623a0-9fbc-4f88-94d3-423dc50c9de1)
+
+Mimaride Onion Architecture uygulanmış, ayrıca Clean Architecture prensiplerine de uygun bir yapı kurulmuştur. Bu yapı sayesinde test edilebilir, sürdürülebilir ve bağımsız modüller geliştirilmiştir.
+
+Katmanlar:
+
+Domain: Saf iş kuralları ve entity tanımları
+
+Application: Use-case'ler ve CQRS komutları
+
+Infrastructure: Harici servis, dosya sistemi, Redis, Dapper vb.
+
+Persistence: EF Core, DbContext, Migrations, Seed işlemleri
+
+Presentation: Web API & Blazor WebAssembly arayüzü
+
+```text
+└── src
+  └── Base
+    ├── Base.Application
+    ├── Base.Domain
+    ├── Base.Infrastructure
+    └── Base.Persistence
+  └── Papara
+    ├── Papara.Application
+    └── Papara.Domain
+  └── Presentation
+        ├── Papara.WebApi (Backend)
+        └── Papara.Wasm (Frontend)
+└── docs
+    └── Papara.postman_collection.json
+```
+
+---
+
+## 📎 Ekstra
+- `UploadedFiles/` klasörüne dosyalar yüklenir (gitignore'dan çıkarılmalı)
+- Tüm alanlarda gerekli validasyonlar FluentValidation ile sağlanmıştır
+- Enum display işlemleri `GetDisplayName()` ile yapılır
+
+---
+
+## 👨‍💼 Geliştirici Bilgisi
 > Geliştirici: Özlem Kalemci  
-> Proje: Papara Expense Management  
+> Proje: Papara Expense Management (Fullstack)  
 > Tarih: Mayıs 2025
