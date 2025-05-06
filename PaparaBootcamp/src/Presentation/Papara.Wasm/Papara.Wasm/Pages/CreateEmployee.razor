@@ -3,7 +3,8 @@
 @using System.Security.Claims
 @using Blazored.Toast.Services
 @using Microsoft.AspNetCore.Components.Authorization
-@using Papara.Wasm.Shared.Models.Expense
+@using Papara.Wasm.Helpers
+@using Papara.Wasm.Shared.Models.Expense.Departments
 @using Papara.Wasm.Shared.Models.Expense.Employees
 @inject HttpClient Http
 @inject IToastService Toast
@@ -39,26 +40,40 @@ else
 
         <div class="mb-3">
             <label>TC Kimlik No:</label>
-            <InputText class="form-control" @bind-Value="employee.IdentityNumber" />
+            <InputText class="form-control"
+                       @bind-Value="employee.IdentityNumber"
+                       maxlength="11"
+                       pattern="[0-9]{11}"
+                       title="11 haneli sayı giriniz" />
         </div>
 
         <div class="mb-3">
             <label>IBAN:</label>
-            <InputText class="form-control" @bind-Value="employee.IBAN" />
+            <InputText class="form-control"
+                       @bind-Value="employee.IBAN"
+                       maxlength="26"
+                       pattern="[A-Z]{2}[0-9A-Z]{14,24}"
+                       title="Geçerli bir IBAN giriniz. Örn: TRXXXXXXXXXXXX" />
         </div>
 
         <div class="mb-3">
-            <label>Departman ID:</label>
-            <InputNumber class="form-control" @bind-Value="employee.DepartmentId" />
+            <label>Departman:</label>
+            <select class="form-select" @bind="employee.DepartmentId">
+                <option value="">Departman Seçiniz</option>
+                @foreach (var dept in departments)
+                {
+                    <option value="@dept.Id">@dept.DepartmentName</option>
+                }
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary">➕ Oluştur</button>
     </EditForm>
 }
 
-
 @code {
     private CreateEmployeeRequest employee = new();
+    private List<DepartmentResponse> departments = new();
     private string? userRole;
 
     protected override async Task OnInitializedAsync()
@@ -69,6 +84,9 @@ else
         if (user.Identity?.IsAuthenticated == true)
         {
             userRole = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            // Departmanları yükle
+            departments = await Http.GetFromJsonAsync<List<DepartmentResponse>>("departments") ?? new();
         }
     }
 
@@ -85,8 +103,7 @@ else
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
-                Toast.ShowError($"Oluşturma başarısız: {error}");
+                await ValidationErrorHelper.ShowErrorsAsync(response, Toast);
             }
         }
         catch (Exception ex)
@@ -94,5 +111,5 @@ else
             Toast.ShowError($"Hata oluştu: {ex.Message}");
         }
     }
-}
 
+}

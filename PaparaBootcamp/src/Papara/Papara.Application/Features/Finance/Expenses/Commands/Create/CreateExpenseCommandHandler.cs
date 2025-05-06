@@ -47,6 +47,8 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
 				CreatedById = _userContextService.GetCurrentUserId() ?? 0,
 				IsActive = true,
 				Concluded = false,
+				PaymentMethod = dto.PaymentMethod,
+				Location = dto.Location,
 			};
 
 			await _unitOfWork.Repository<Expense>().AddAsync(expense);

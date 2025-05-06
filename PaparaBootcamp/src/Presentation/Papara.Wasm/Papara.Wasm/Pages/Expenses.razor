@@ -1,13 +1,19 @@
 ﻿@page "/expenses"
 
+<h3>📋 Masraf Listesi</h3>
+
 @using System.Security.Claims
 @using Blazored.Toast.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 @using Papara.Wasm.Extensions
+@using Papara.Wasm.Helpers
 @using Papara.Wasm.Services
 @using Papara.Wasm.Shared.Models
 @using Papara.Wasm.Shared.Models.Expense
+@using Papara.Wasm.Shared.Models.Expense.ExpenseApprovals
 @using Papara.Wasm.Shared.Models.Expense.ExpenseAttachments
+@using Papara.Wasm.Shared.Models.Expense.ExpenseTypes
 @using Papara.Wasm.Shared.Models.Expense.Expenses
 @inject HttpClient Http
 @inject IToastService Toast
@@ -15,134 +21,331 @@
 @inject NavigationManager Navigation
 @inject ConfigurationModel Config
 
-<h3>📋 Onay Bekleyen Masraf Listesi</h3>
+<div class="card p-3 mb-4">
+	<h5>🔍 Filtrele</h5>
+	<div class="row g-2">
+		<div class="col-md-3">
+			<label class="form-label">Başlangıç Tarihi</label>
+			<InputDate class="form-control" @bind-Value="startDate" />
+		</div>
+		<div class="col-md-3">
+			<label class="form-label">Bitiş Tarihi</label>
+			<InputDate class="form-control" @bind-Value="endDate" />
+		</div>
+		<div class="col-md-3">
+			<label class="form-label">Kategori</label>
+			<select class="form-select" @bind="selectedExpenseTypeId">
+				<option value="">Tümü</option>
+				@foreach (var type in expenseTypes)
+				{
+					<option value="@type.Id">@type.Name</option>
+				}
+			</select>
+		</div>
+		<div class="col-md-3">
+			<label class="form-label">Durum</label>
+			<select class="form-select" @bind="selectedConcludedString">
+				<option value="">Tümü</option>
+				<option value="false">Onay Bekliyor</option>
+				<option value="true">Sonuçlandı</option>
+			</select>
+
+
+		</div>
+	</div>
+	<button class="btn btn-primary mt-3" @onclick="ApplyFilters">Filtrele</button>
+</div>
 
 @if (isLoading)
 {
-    <p>Yükleniyor...</p>
+	<p>Yükleniyor...</p>
 }
 else if (expenses?.Any() != true)
 {
-    <p>Hiç masraf bulunamadı.</p>
+	<p>Hiç masraf bulunamadı.</p>
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Tarih</th>
-                <th>Tutar</th>
-                <th>Kategori</th>
-                <th>Açıklama</th>
-                <th>Belge</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var expense in expenses)
-            {
-                <tr>
-                    <td>@expense.ExpenseDate.ToString("dd.MM.yyyy")</td>
-                    <td>@expense.Amount.ToString("C")</td>
-                    <td>@expense.ResponseExpenseType?.Name</td>
-                    <td>@expense.Description</td>
-                    <td>
-                        <button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.Id)">📎 Belge</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Tarih</th>
+				<th>Tutar</th>
+				<th>Kategori</th>
+				<th>Açıklama</th>
+				<th>Durum</th>
+				<th>Belge</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var expense in expenses)
+			{
+				<tr>
+					<td>@expense.ExpenseDate.ToString("dd.MM.yyyy")</td>
+					<td>@expense.Amount.ToString("C")</td>
+					<td>@expense.ResponseExpenseType?.Name</td>
+					<td>@expense.Description</td>
+					<td>@(expense.Concluded ? "Sonuçlandı" : "Onay Bekliyor")</td>
+					<td>
+						<button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.Id)">📎 Belge</button>
+					</td>
+					<td>
+						@if (expense.Concluded)
+						{
+							<button class="btn btn-outline-info btn-sm" @onclick="() => ShowApprovalResult(expense.Id)">
+								📝 Sonucu Göster
+							</button>
+						}
+					</td>
+
+				</tr>
+			}
+		</tbody>
+	</table>
+	@if (isApprovalModalVisible && selectedApproval != null)
+	{
+		<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Onay Durumu</h5>
+						<button type="button" class="btn-close" @onclick="CloseApprovalModal"></button>
+					</div>
+					<div class="modal-body">
+						<p><strong>Durum:</strong> @selectedApproval.Status.GetDisplayName()</p>
+						@if (!string.IsNullOrWhiteSpace(selectedApproval.Description))
+						{
+							<p><strong>Açıklama:</strong> @selectedApproval.Description</p>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
 }
 
 @if (isModalVisible && !string.IsNullOrEmpty(selectedFileUrl))
 {
-    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Belge Görüntüleme</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <img src="@selectedFileUrl" alt="Belge" class="img-fluid" />
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Belge Görüntüleme</h5>
+					<button type="button" class="btn-close" @onclick="CloseModal"></button>
+				</div>
+				<div class="modal-body">
+					<img src="@selectedFileUrl" alt="Belge" class="img-fluid" />
+				</div>
+			</div>
+		</div>
+	</div>
+}
+@if (isUploadModalVisible)
+{
+	<div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Belge Yükle</h5>
+					<button type="button" class="btn-close" @onclick="CloseUploadModal"></button>
+				</div>
+				<div class="modal-body">
+					<InputFile OnChange="HandleFileChange" />
+					<InputText @bind-Value="description" class="form-control mt-2" placeholder="Açıklama (isteğe bağlı)" />
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-primary" @onclick="UploadAttachment">Yükle</button>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
 <button class="btn btn-success mt-3" @onclick="NavigateToAddExpense">
-    ➕ Yeni Masraf Ekle
+	➕ Yeni Masraf Ekle
 </button>
 
 @code {
-    private List<ExpenseResponse>? expenses;
-    private bool isLoading = true;
-    private string? selectedFileUrl;
-    private bool isModalVisible = false;
+	private List<ExpenseResponse>? expenses;
+	private List<ExpenseTypeResponse> expenseTypes = new();
+	private bool isLoading = true;
+	private string? selectedFileUrl;
+	private bool isModalVisible = false;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
+	private IBrowserFile? selectedFile;
+	private long uploadExpenseId;
+	private bool isUploadModalVisible = false;
+	private string? description;
 
-            if (user.Identity?.IsAuthenticated == true)
-            {
-                var empIdClaim = user.FindFirst("EmployeeId")?.Value;
+	private DateTimeOffset? startDate;
+	private DateTimeOffset? endDate;
+	private long? selectedExpenseTypeId;
 
-                if (!string.IsNullOrEmpty(empIdClaim) && long.TryParse(empIdClaim, out var employeeId))
-                {
-                    expenses = await Http.GetFromJsonAsync<List<ExpenseResponse>>(
-                        $"expenses?EmployeeId={employeeId}&IncludeExpenseType=true");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Masraf listeleme hatası: {ex}");
-            Toast.ShowError("Masraflar yüklenirken bir hata oluştu.");
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
+	private ExpenseApprovalResponse? selectedApproval;
+	private bool isApprovalModalVisible = false;
 
-    private void NavigateToAddExpense()
-    {
-        Navigation.NavigateTo("/expenses/add");
-    }
+	private string? selectedConcludedString;
+	private bool? concluded => selectedConcludedString switch
+	{
+		"true" => true,
+		"false" => false,
+		_ => null
+	};
 
-    private async Task ShowAttachmentModal(long expenseId)
-    {
-        try
-        {
-            var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>(
-                $"expenseattachments?ExpenseId={expenseId}");
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			expenseTypes = await Http.GetFromJsonAsync<List<ExpenseTypeResponse>>("expensetypes") ?? new();
+			await ApplyFilters();
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError("Sayfa yüklenemedi.");
+			Console.Error.WriteLine(ex.Message);
+		}
+	}
 
-            var file = response?.FirstOrDefault();
+	private async Task ApplyFilters()
+	{
+		isLoading = true;
+		try
+		{
+			var authState = await AuthProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+			var empId = long.Parse(user.FindFirst("EmployeeId")!.Value);
 
-            if (file != null)
-            {
-                selectedFileUrl = $"{Config.FileBaseUrl}{file.FilePath}";
-                isModalVisible = true;
-            }
-            else
-            {
-                Toast.ShowInfo("Bu masrafa ait bir belge bulunamadı.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Toast.ShowError($"Belge alınırken hata oluştu: {ex.Message}");
-        }
-    }
+			var queryParams = new Dictionary<string, string?>
+				{
+					["EmployeeId"] = empId.ToString(),
+					["Concluded"] = concluded?.ToString().ToLower(),
+					["ExpenseTypeId"] = selectedExpenseTypeId?.ToString(),
+					["StartDate"] = startDate?.ToString("o"),
+					["EndDate"] = endDate?.ToString("o"),
+					["IncludeExpenseType"] = "true"
+				};
 
-    private void CloseModal()
-    {
-        selectedFileUrl = null;
-        isModalVisible = false;
-    }
+			var query = string.Join("&", queryParams
+				.Where(kv => !string.IsNullOrEmpty(kv.Value))
+				.Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value!)}"));
+
+			expenses = await Http.GetFromJsonAsync<List<ExpenseResponse>>($"expenses?{query}");
+
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError("Filtreleme sırasında hata oluştu.");
+			Console.Error.WriteLine(ex.Message);
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+	private void NavigateToAddExpense()
+	{
+		Navigation.NavigateTo("/expenses/add");
+	}
+
+	private async Task ShowAttachmentModal(long expenseId)
+	{
+		try
+		{
+			var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>($"expenseattachments?ExpenseId={expenseId}");
+			var file = response?.FirstOrDefault();
+
+			if (file != null)
+			{
+				selectedFileUrl = $"{Config.FileBaseUrl}{file.FilePath}";
+				isModalVisible = true;
+			}
+			else
+			{
+				uploadExpenseId = expenseId;
+				isUploadModalVisible = true;
+			}
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError($"Belge alınırken hata oluştu: {ex.Message}");
+		}
+	}
+
+	private void CloseUploadModal()
+	{
+		selectedFile = null;
+		isUploadModalVisible = false;
+		description = null;
+	}
+
+	private void HandleFileChange(InputFileChangeEventArgs e)
+	{
+		selectedFile = e.File;
+	}
+	private async Task UploadAttachment()
+	{
+		if (selectedFile != null)
+		{
+			try
+			{
+				var content = new MultipartFormDataContent();
+				var fileContent = new StreamContent(selectedFile.OpenReadStream(5_000_000));
+				fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+
+				content.Add(fileContent, "File", selectedFile.Name);
+				content.Add(new StringContent(description ?? string.Empty), "Description");
+				content.Add(new StringContent(uploadExpenseId.ToString()), "ExpenseId");
+
+				var result = await Http.PostAsync("expenseattachments", content);
+				if (result.IsSuccessStatusCode)
+				{
+					Toast.ShowSuccess("Belge başarıyla yüklendi.");
+					await ApplyFilters(); // Listeyi yenile
+				}
+				else
+				{
+					await ValidationErrorHelper.ShowErrorsAsync(result, Toast);
+				}
+			}
+			catch (Exception ex)
+			{
+				Toast.ShowError($"Yükleme sırasında hata oluştu: {ex.Message}");
+			}
+			finally
+			{
+				CloseUploadModal();
+			}
+		}
+	}
+
+	private async Task ShowApprovalResult(long expenseId)
+	{
+		try
+		{
+			var approvals = await Http.GetFromJsonAsync<List<ExpenseApprovalResponse>>($"expense-approvals?ExpenseId={expenseId}&IncludeExpense=true");
+
+			selectedApproval = approvals?.FirstOrDefault();
+			isApprovalModalVisible = selectedApproval != null;
+
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowError("Onay durumu alınamadı.");
+			Console.Error.WriteLine(ex.Message);
+		}
+	}
+
+	private void CloseApprovalModal()
+	{
+		selectedApproval = null;
+		isApprovalModalVisible = false;
+	}
+	private void CloseModal()
+	{
+		selectedFileUrl = null;
+		isModalVisible = false;
+	}
 }

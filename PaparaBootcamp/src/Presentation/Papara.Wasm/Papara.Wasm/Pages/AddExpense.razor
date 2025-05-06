@@ -1,6 +1,8 @@
 ﻿@page "/expenses/add"
 @using Blazored.Toast.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Extensions
+@using Papara.Wasm.Helpers
 @using Papara.Wasm.Services
 @using Papara.Wasm.Shared.Models
 @using Papara.Wasm.Shared.Models.Expense
@@ -43,6 +45,22 @@ else
                     <option value="@type.Id">@type.Name</option>
                 }
             </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Konum</label>
+            <InputText @bind-Value="expenseModel.Location" class="form-control" placeholder="Harcamayı yaptığınız yer" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ödeme Yöntemi</label>
+            <InputSelect @bind-Value="expenseModel.PaymentMethod" class="form-select">
+                @foreach (PaymentMethod method in Enum.GetValues(typeof(PaymentMethod)))
+                {
+                    <option value="@method">@method.GetDisplayName()</option>
+                }
+            </InputSelect>
+            
         </div>
 
         <div class="mb-3">
@@ -107,22 +125,30 @@ else
         try
         {
             var response = await Http.PostAsJsonAsync("expenses", expenseModel);
-            var createdExpense = await response.Content.ReadFromJsonAsync<CreateExpenseResponse>();
 
-            if (selectedFile != null && createdExpense != null)
+            if (response.IsSuccessStatusCode)
             {
-                var content = new MultipartFormDataContent();
-                var fileContent = new StreamContent(selectedFile.OpenReadStream(5_000_000)); // max 5MB
-                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+                var createdExpense = await response.Content.ReadFromJsonAsync<CreateExpenseResponse>();
 
-                content.Add(fileContent, "File", selectedFile.Name);
-                content.Add(new StringContent(createdExpense.Id.ToString()), "ExpenseId");
+                if (selectedFile != null && createdExpense != null)
+                {
+                    var content = new MultipartFormDataContent();
+                    var fileContent = new StreamContent(selectedFile.OpenReadStream(5_000_000));
+                    fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
 
-                await Http.PostAsync("expenseattachments", content);
+                    content.Add(fileContent, "File", selectedFile.Name);
+                    content.Add(new StringContent(createdExpense.Id.ToString()), "ExpenseId");
+
+                    await Http.PostAsync("expenseattachments", content);
+                }
+
+                Toast.ShowSuccess("Masraf başarıyla eklendi.");
+                Navigation.NavigateTo("/expenses");
             }
-
-            Toast.ShowSuccess("Masraf başarıyla eklendi.");
-            Navigation.NavigateTo("/expenses");
+            else
+            {
+                await ValidationErrorHelper.ShowErrorsAsync(response, Toast);
+            }
         }
         catch (Exception ex)
         {
@@ -130,4 +156,6 @@ else
             Console.Error.WriteLine(ex);
         }
     }
+
+
 }

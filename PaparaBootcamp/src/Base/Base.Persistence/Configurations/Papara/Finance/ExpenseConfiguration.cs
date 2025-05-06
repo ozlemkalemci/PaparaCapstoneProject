@@ -38,6 +38,13 @@ namespace Base.Persistence.Configurations.Papara.Finance
 				.IsRequired()
 				.HasDefaultValue(false);
 
+			builder.Property(x => x.Location)
+				.HasMaxLength(255);
+
+			builder.Property(x => x.PaymentMethod)
+				.IsRequired()
+				.HasConversion<byte>();
+
 			builder.HasMany(x => x.Attachments)
 				.WithOne(x => x.Expense)
 				.HasForeignKey(x => x.ExpenseId)

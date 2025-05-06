@@ -7,11 +7,9 @@
 @using Blazored.Toast.Services
 @using Papara.Wasm.Extensions
 @using Papara.Wasm.Shared.Models.Expense.Employees
-@using Papara.Wasm.Shared.Models.Expense.ExpenseAttachments
 @using Papara.Wasm.Shared.Models.Expense.Reports
 @inject HttpClient Http
 @inject IToastService Toast
-@inject ConfigurationModel Config
 
 <div class="mb-3">
     <label>Personel Seç:</label>
@@ -22,7 +20,6 @@
             <option value="@employee.Id">@($"{employee.FirstName} {employee.MiddleName} {employee.LastName}".Replace("  ", " "))</option>
         }
     </select>
-
 </div>
 
 @if (isLoading)
@@ -43,7 +40,6 @@ else
                 <th>Durum</th>
                 <th>Kategori</th>
                 <th>Açıklama</th>
-                <th>Belge</th>
             </tr>
         </thead>
         <tbody>
@@ -55,51 +51,10 @@ else
                     <td>@expense.Status.GetDisplayName()</td>
                     <td>@expense.ExpenseType</td>
                     <td>@expense.Description</td>
-                    <td>
-                        <button class="btn btn-outline-primary btn-sm" @onclick="() => ShowAttachmentModal(expense.ExpenseId)">📎 Belge</button>
-                    </td>
                 </tr>
             }
         </tbody>
     </table>
-}
-
-@if (isModalVisible && !string.IsNullOrEmpty(selectedFileUrl))
-{
-    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Belge Görüntüleme</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <img src="@selectedFileUrl" alt="Belge" class="img-fluid" />
-                </div>
-            </div>
-        </div>
-    </div>
-}
-@if (isUploadModalVisible)
-{
-    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Belge Yükle</h5>
-                    <button type="button" class="btn-close" @onclick="CloseUploadModal"></button>
-                </div>
-                <div class="modal-body">
-                    <InputFile OnChange="HandleFileChange" />
-                    <InputText @bind-Value="description" class="form-control mt-2" placeholder="Açıklama (isteğe bağlı)" />
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" @onclick="UploadAttachment">Yükle</button>
-                   
-                </div>
-            </div>
-        </div>
-    </div>
 }
 
 @code {
@@ -107,12 +62,7 @@ else
     private List<PersonnelExpenseReportResponse>? expenses;
     private long? selectedEmployeeId;
     private bool isLoading = false;
-    private string? selectedFileUrl;
-    private bool isModalVisible = false;
-    private IBrowserFile? selectedFile;
-    private long uploadExpenseId;
-    private bool isUploadModalVisible = false;
-    private string? description;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadEmployeesAsync();
@@ -157,30 +107,6 @@ else
         }
     }
 
-    private async Task ShowAttachmentModal(long expenseId)
-    {
-        try
-        {
-            var response = await Http.GetFromJsonAsync<List<ExpenseAttachmentResponse>>($"expenseattachments?ExpenseId={expenseId}");
-            var file = response?.FirstOrDefault();
-
-            if (file != null)
-            {
-                selectedFileUrl = $"{Config.FileBaseUrl}{file.FilePath}";
-                isModalVisible = true;
-            }
-            else
-            {
-                ShowUploadModal(expenseId);
-            }
-        }
-        catch (Exception ex)
-        {
-            Toast.ShowError("Belge alınamadı.");
-            Console.Error.WriteLine("Hata: " + ex.Message);
-        }
-    }
-
     private async Task OnEmployeeChanged(ChangeEventArgs e)
     {
         if (long.TryParse(e.Value?.ToString(), out var id))
@@ -188,62 +114,5 @@ else
             selectedEmployeeId = id;
             await LoadExpensesAsync();
         }
-    }
-    private void ShowUploadModal(long expenseId)
-    {
-        uploadExpenseId = expenseId;
-        isUploadModalVisible = true;
-    }
-
-    private void CloseUploadModal()
-    {
-        selectedFile = null;
-        isUploadModalVisible = false;
-    }
-
-    private void HandleFileChange(InputFileChangeEventArgs e)
-    {
-        selectedFile = e.File;
-    }
-
-    private async Task UploadAttachment()
-    {
-        if (selectedFile != null)
-        {
-            try
-            {
-                var content = new MultipartFormDataContent();
-                var fileContent = new StreamContent(selectedFile.OpenReadStream(5_000_000));
-                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
-
-                content.Add(fileContent, "File", selectedFile.Name);
-                content.Add(new StringContent(description ?? string.Empty), "Description");
-                content.Add(new StringContent(uploadExpenseId.ToString()), "ExpenseId");
-
-                var result = await Http.PostAsync("expenseattachments", content);
-                if (result.IsSuccessStatusCode)
-                {
-                    Toast.ShowSuccess("Belge başarıyla yüklendi.");
-                    await LoadExpensesAsync();
-                }
-                else
-                {
-                    Toast.ShowError("Belge yüklenemedi.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Toast.ShowError($"Yükleme sırasında hata oluştu: {ex.Message}");
-            }
-            finally
-            {
-                CloseUploadModal();
-            }
-        }
-    }
-    private void CloseModal()
-    {
-        selectedFileUrl = null;
-        isModalVisible = false;
     }
 }
