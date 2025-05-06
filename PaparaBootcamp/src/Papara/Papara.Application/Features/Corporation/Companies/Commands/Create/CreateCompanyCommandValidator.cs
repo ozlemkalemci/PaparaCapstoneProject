@@ -16,6 +16,6 @@ public class CreateCompanyCommandValidator : AbstractValidator<CreateCompanyComm
 
 		RuleFor(x => x.Request.CompanyIBAN)
 			.NotEmpty().WithMessage("Şirket IBAN bilgisi zorunludur.")
-			.MaximumLength(34).WithMessage("IBAN en fazla 34 karakter olabilir.")
+			.MaximumLength(34).WithMessage("IBAN en fazla 34 karakter olabilir.");
 	}
 }

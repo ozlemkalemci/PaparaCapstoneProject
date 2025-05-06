@@ -15,7 +15,7 @@ public class UpdateExpenseAttachmentCommandValidator : AbstractValidator<UpdateE
 			.WithMessage("Dosya seçilmelidir.")
 			.Must(file => file != null && file.Length > 0)
 			.WithMessage("Boş bir dosya yüklenemez.")
-			.Must(file => file.Length <= 5 * 1024 * 1024) // 5 MB sınırı koyduk
+			.Must(file => file.Length <= 5 * 1024 * 1024) // 5 MB sınırı
 			.WithMessage("Dosya boyutu 5 MB'ı geçemez.");
 
 		RuleFor(x => x.Request.File.ContentType)
