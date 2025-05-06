@@ -1,4 +1,6 @@
-﻿namespace Papara.Application.Features.Finance.Expenses.Models;
+﻿using Papara.Domain.Enums.Finance;
+
+namespace Papara.Application.Features.Finance.Expenses.Models;
 
 public class CreateExpenseRequest
 {
@@ -7,5 +9,6 @@ public class CreateExpenseRequest
 	public decimal Amount { get; set; }
 	public string Description { get; set; } = null!;
 	public DateTimeOffset ExpenseDate { get; set; }
-	public bool Concluded { get; set; }
+	public string? Location { get; set; }
+	public PaymentMethod PaymentMethod { get; set; }
 }

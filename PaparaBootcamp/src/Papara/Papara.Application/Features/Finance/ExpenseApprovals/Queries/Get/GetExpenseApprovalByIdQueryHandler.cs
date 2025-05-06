@@ -23,8 +23,7 @@ public class GetExpenseApprovalByIdQueryHandler : IRequestHandler<GetExpenseAppr
 			x => x.Expense,
 		};
 
-		var entity = await _unitOfWork.Repository<ExpenseApproval>()
-			.GetByIdAsync(request.Id, includes.ToArray());
+		var entity = await _unitOfWork.Repository<ExpenseApproval>().GetByIdAsync(request.Id, includes.ToArray());
 
 		if (entity == null)
 			throw new KeyNotFoundException("Onay kaydı bulunamadı.");

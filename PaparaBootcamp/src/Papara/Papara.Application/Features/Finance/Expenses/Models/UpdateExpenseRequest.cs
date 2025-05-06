@@ -1,4 +1,6 @@
-﻿namespace Papara.Application.Features.Finance.Expenses.Models;
+﻿using Papara.Domain.Enums.Finance;
+
+namespace Papara.Application.Features.Finance.Expenses.Models;
 
 public class UpdateExpenseRequest
 {

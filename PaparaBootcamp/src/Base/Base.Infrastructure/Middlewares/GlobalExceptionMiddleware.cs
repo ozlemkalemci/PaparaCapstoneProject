@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Base.Application.Common.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using System.Text.Json;
-using Microsoft.IdentityModel.Tokens;
-using Base.Application.Common.Exceptions;
+using FluentValidation;
 
 namespace Base.Infrastructure.Middlewares;
 
@@ -52,6 +52,11 @@ public class GlobalExceptionMiddleware
 			case UnauthorizedAccessException:
 				response.StatusCode = (int)HttpStatusCode.Unauthorized;
 				errorDetails = new { message = $"Yetkisiz erişim. {exception.Message}" };
+				break;
+
+			case FluentValidation.ValidationException ve:
+				response.StatusCode = (int)HttpStatusCode.BadRequest;
+				errorDetails = new { message = ve.Message };
 				break;
 
 			case ForbidException:

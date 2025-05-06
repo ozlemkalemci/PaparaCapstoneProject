@@ -13,6 +13,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 {
 	[ApiController]
 	[Route("api/expenses")]
+	[Authorize(Roles = "Admin,Employee")]
 	public class ExpensesController : ApiControllerBase
 	{
 		private readonly IUserContextService _userContextService;
@@ -28,7 +29,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// <param name="request">Filtreleme parametreleri</param>
 		/// <returns>Masraf listesi</returns>
 		[HttpGet]
-		[Authorize(Roles = "Admin,Employee")]
+		
 		public async Task<IActionResult> GetAll([FromQuery] GetExpenseRequest request)
 		{
 			var result = await Mediator.Send(new GetAllExpensesQuery(request));
@@ -41,7 +42,6 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// <param name="id">Masraf ID</param>
 		/// <returns>Masraf detayı</returns>
 		[HttpGet("{id:long}")]
-		[Authorize(Roles = "Admin,Employee")]
 		public async Task<IActionResult> GetById(long id)
 		{
 			var result = await Mediator.Send(new GetExpenseByIdQuery(id));
@@ -49,12 +49,11 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		/// <summary>
-		/// Yeni bir masraf kaydı oluşturur. Sadece personel erişebilir.
+		/// Yeni bir masraf kaydı oluşturur.
 		/// </summary>
 		/// <param name="request">Yeni masraf bilgileri</param>
 		/// <returns>Oluşturulan masraf</returns>
 		[HttpPost]
-		[Authorize(Roles = "Employee")]
 		public async Task<IActionResult> Create([FromBody] CreateExpenseRequest request)
 		{
 			var result = await Mediator.Send(new CreateExpenseCommand(request));
@@ -62,13 +61,12 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		/// <summary>
-		/// Mevcut bir masraf kaydını günceller. Sadece personel erişebilir.
+		/// Mevcut bir masraf kaydını günceller.
 		/// </summary>
 		/// <param name="id">Masraf ID</param>
 		/// <param name="request">Yeni masraf bilgileri</param>
 		/// <returns>Güncellenmiş masraf</returns>
 		[HttpPut("{id:long}")]
-		[Authorize(Roles = "Employee")]
 		public async Task<IActionResult> Update(long id, [FromBody] UpdateExpenseRequest request)
 		{
 			var result = await Mediator.Send(new UpdateExpenseCommand(id, request));
@@ -76,11 +74,10 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		/// <summary>
-		/// Belirli bir masraf kaydını siler. Admin ve personel erişebilir.
+		/// Belirli bir masraf kaydını siler.
 		/// </summary>
 		/// <param name="id">Masraf ID</param>
 		[HttpDelete("{id:long}")]
-		[Authorize(Roles = "Admin,Employee")]
 		public async Task<IActionResult> Delete(long id)
 		{
 			await Mediator.Send(new DeleteExpenseCommand(id));

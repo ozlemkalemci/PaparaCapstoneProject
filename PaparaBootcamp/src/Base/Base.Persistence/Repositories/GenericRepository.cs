@@ -100,6 +100,17 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
 
 		return await query.FirstOrDefaultAsync(x => x.Id == id);
 	}
+	public async Task<T?> GetByIdAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+	{
+		var query = dbSet.AsQueryable();
+
+		foreach (var include in includes)
+		{
+			query = query.Include(include);
+		}
+
+		return await query.FirstOrDefaultAsync(filter);
+	}
 
 	public void Update(T entity)
 	{

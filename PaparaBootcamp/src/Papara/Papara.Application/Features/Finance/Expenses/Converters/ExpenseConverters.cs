@@ -1,7 +1,6 @@
 ﻿using Papara.Application.Features.Finance.Expenses.Models;
-using Papara.Application.Features.HR.Employees.Converters;
 using Papara.Application.Features.Finance.ExpenseTypes.Converters;
-using Papara.Domain.Entities.Finance;
+using Papara.Application.Features.HR.Employees.Converters;
 
 namespace Papara.Application.Features.Finance.Expenses.Converters;
 
@@ -18,6 +17,8 @@ public static class ExpenseConverters
 			ExpenseDate = item.ExpenseDate,
 			ExpenseTypeId = item.ExpenseTypeId,
 			Concluded = item.Concluded,
+			Location = item.Location,
+			PaymentMethod = item.PaymentMethod,
 
 			ResponseEmployee = item.Employee == null ? null :
 				EmployeeConverters.EmployeeConverter(item.Employee),
@@ -25,7 +26,7 @@ public static class ExpenseConverters
 			ResponseExpenseType = item.ExpenseType == null ? null :
 				ExpenseTypeConverters.ExpenseTypeConverter(item.ExpenseType),
 
-		
+
 		};
 	}
 

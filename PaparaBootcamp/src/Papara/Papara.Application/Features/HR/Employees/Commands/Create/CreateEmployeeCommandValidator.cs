@@ -19,7 +19,9 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
 
 		RuleFor(x => x.Request.IdentityNumber)
 			.NotEmpty().WithMessage("TC Kimlik numarası boş olamaz.")
-			.Length(11).WithMessage("TC Kimlik numarası 11 haneli olmalıdır.");
+			.Length(11).WithMessage("TC Kimlik numarası 11 haneli olmalıdır.")
+			.Matches("^[0-9]{11}$").WithMessage("TC Kimlik numarası yalnızca rakamlardan oluşmalıdır.");
+
 
 		RuleFor(x => x.Request.IBAN)
 			.NotEmpty().WithMessage("IBAN boş olamaz.")

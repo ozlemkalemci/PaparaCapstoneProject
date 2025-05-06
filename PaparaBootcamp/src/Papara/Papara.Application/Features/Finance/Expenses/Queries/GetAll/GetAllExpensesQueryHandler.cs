@@ -22,7 +22,7 @@ public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, L
 
 	public async Task<List<ExpenseResponse>> Handle(GetAllExpensesQuery request, CancellationToken cancellationToken)
 	{
-		var filter = (Expression<Func<Expense, bool>>)(x => x.IsActive && x.Concluded == false);
+		var filter = (Expression<Func<Expense, bool>>)(x => x.IsActive);
 		var includes = new List<Expression<Func<Expense, object>>>();
 		var currentUserRole = _userContextService.GetCurrentUserRole();
 
@@ -38,10 +38,26 @@ public class GetAllExpensesQueryHandler : IRequestHandler<GetAllExpensesQuery, L
 		{
 			filter = filter.And(x => x.EmployeeId == request.Request.EmployeeId);
 		}
-		if (request.Request.ExpenseTypeId.HasValue)
+		if (request.Request.ExpenseTypeId > 0)
 		{
 			filter = filter.And(x => x.ExpenseTypeId == request.Request.ExpenseTypeId);
 		}
+		if (request.Request.Concluded != null)
+		{
+			filter = filter.And(x => x.Concluded == request.Request.Concluded);
+		}
+		if (request.Request.StartDate != null)
+		{
+			var startDate = request.Request.StartDate.Value.Date;
+			filter = filter.And(x => x.ExpenseDate.Date >= startDate);
+		}
+
+		if (request.Request.EndDate != null)
+		{
+			var endDate = request.Request.EndDate.Value.Date;
+			filter = filter.And(x => x.ExpenseDate.Date <= endDate);
+		}
+
 		if (request.Request.IncludeEmployee)
 		{
 			includes.Add(x => x.Employee);

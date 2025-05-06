@@ -4,6 +4,7 @@
 @using Blazored.Toast.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using Papara.Wasm.Extensions
+@using Papara.Wasm.Helpers
 @using Papara.Wasm.Services
 @using Papara.Wasm.Shared.Models
 @using Papara.Wasm.Shared.Models.Expense
@@ -391,10 +392,9 @@ else
 		}
 		else
 		{
-			Toast.ShowError("Adres kaydedilemedi.");
+			await ValidationErrorHelper.ShowErrorsAsync(response, Toast);
 		}
 	}
-
 
 	private async Task HandleAddPhone()
 	{
@@ -408,6 +408,7 @@ else
 		{
 			response = await Http.PostAsJsonAsync("employeephones", newPhone);
 		}
+
 		if (response.IsSuccessStatusCode)
 		{
 			Toast.ShowSuccess("Telefon eklendi.");
@@ -416,9 +417,10 @@ else
 		}
 		else
 		{
-			Toast.ShowError("Telefon eklenemedi.");
+			await ValidationErrorHelper.ShowErrorsAsync(response, Toast);
 		}
 	}
+
 
 	private async Task EditAddress(long id)
 	{

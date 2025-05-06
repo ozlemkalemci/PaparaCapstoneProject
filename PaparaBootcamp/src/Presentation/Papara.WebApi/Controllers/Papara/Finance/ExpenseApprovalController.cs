@@ -16,7 +16,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 {
 	[ApiController]
 	[Route("api/expense-approvals")]
-	[Authorize(Roles = "Admin")]
+	
 	public class ExpenseApprovalController : ApiControllerBase
 	{
 		private readonly IExpenseApprovalService _expenseApprovalService;
@@ -31,10 +31,10 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		/// <summary>
-		/// Tüm masraf onaylarını filtreli olarak listeler.
+		/// Tüm masraf onaylarını filtreli olarak listeler. Admin tüm personelin, Employee kendisinin onaylarını görebilir.
 		/// </summary>
 		[HttpGet]
-		
+		[Authorize(Roles = "Admin,Employee")]
 		public async Task<IActionResult> GetAll([FromQuery] GetExpenseApprovalRequest request)
 		{
 			var result = await Mediator.Send(new GetAllExpenseApprovalsQuery(request));
@@ -45,6 +45,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// Belirli bir masraf onay kaydını getirir.
 		/// </summary>
 		[HttpGet("{id:long}")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetById(long id)
 		{
 			var result = await Mediator.Send(new GetExpenseApprovalByIdQuery(id));
@@ -55,6 +56,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// Yalnızca onaylama işlemi yapar. Para transferi gerçekleştirmez.
 		/// </summary>
 		[HttpPost]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> Create([FromBody] CreateExpenseApprovalRequest request)
 		{
 			var result = await Mediator.Send(new CreateExpenseApprovalCommand(request));
@@ -65,6 +67,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// Onaylanmış bir masraf kaydını geri çeker
 		/// </summary>
 		[HttpPost("revert/{id:long}")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> Revert(long id, [FromBody] string? description)
 		{
 			var result = await Mediator.Send(new RevertExpenseApprovalCommand(id, description));
@@ -72,9 +75,10 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		}
 
 		/// <summary>
-		/// Masrafı onaylar ve eş zamanlı olarak tanımlı IBAN'lara para transferini gerçekleştirir.
+		/// Masrafı onaylar ve eş zamanlı olarak tanımlı IBAN'lara para transferini gerçekleştirir. BankAccount tablosunda IBANların karşılığı olmalıdır.
 		/// </summary>
 		[HttpPost("approve-and-transfer")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> CreateAndTransfer([FromBody] CreateAndTransferApprovalRequest request)
 		{
 			var result = await _expenseApprovalService.CreateAndTransferApprovalAsync(request);
@@ -85,6 +89,7 @@ namespace Papara.WebApi.Controllers.Papara.Finance
 		/// Daha önce onaylanmış bir masraf için manuel olarak yalnızca ödeme işlemini başlatır.
 		/// </summary>
 		[HttpPost("transfer")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> TransferOnly([FromBody] BankTransferRequest request)
 		{
 			var result = await _bankTransferService.TransferAsync(request);

@@ -6,6 +6,7 @@ namespace Base.Domain.Interfaces;
 public interface IRepository<T> where T : BaseEntity
 {
 	Task<T?> GetByIdAsync(long id, params Expression<Func<T, object>>[] includes);
+	Task<T?> GetByIdAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
 	Task<List<T>> GetAllAsync(params string[] includes);
 	Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, params Expression<Func<T, object>>[] includes);
 	Task<List<T>> Where(Expression<Func<T, bool>> predicate, params string[] includes);

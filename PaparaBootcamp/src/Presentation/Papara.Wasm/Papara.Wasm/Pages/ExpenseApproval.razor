@@ -1,0 +1,226 @@
+﻿@page "/expense-approve"
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Papara.Wasm.Extensions
+@using Papara.Wasm.Helpers
+@using Papara.Wasm.Shared.Models.Expense
+@using Blazored.Toast.Services
+@using Papara.Wasm.Shared.Models.Expense.ExpenseApprovals
+@inject HttpClient Http
+@inject IToastService Toast
+@inject AuthenticationStateProvider AuthProvider
+
+<h3>✅ Masraf Onay İşlemleri</h3>
+
+@if (isLoading)
+{
+    <p>Yükleniyor...</p>
+}
+else if (approvals == null || !approvals.Any())
+{
+    <p>Onay bekleyen masraf bulunamadı.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Masraf Tarihi</th>
+                <th>Tutar</th>
+                <th>Açıklama</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in approvals)
+            {
+                <tr>
+                    <td>@item.ResponseExpense?.ExpenseDate.ToString("dd.MM.yyyy")</td>
+                    <td>@item.ResponseExpense?.Amount.ToString("C")</td>
+                    <td>@item.ResponseExpense?.Description</td>
+                    <td>@item.Status.GetDisplayName()</td>
+                    <td>
+                        @if (item.Status == ExpenseApprovalStatus.Pending)
+                        {
+                            <button class="btn btn-success btn-sm me-2" @onclick="@(() => ShowApprovalModal(item.ExpenseId, ExpenseApprovalStatus.Approved))">Onayla</button>
+                            <button class="btn btn-danger btn-sm me-2" @onclick="@(() => ShowApprovalModal(item.ExpenseId, ExpenseApprovalStatus.Rejected))">Reddet</button>
+
+                        }
+                        else
+                        {
+                            <button class="btn btn-warning btn-sm" @onclick="() => Revert(item.Id)">↩️ Geri Al</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (isApprovalModalVisible)
+    {
+        <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Açıklama Giriniz</h5>
+                        <button type="button" class="btn-close" @onclick="() => isApprovalModalVisible = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea class="form-control mb-3" @bind="approvalDescription" rows="4" placeholder="Onay/Red açıklaması yazınız..."></textarea>
+                        <button class="btn btn-primary" @onclick="HandleApprovalSubmit">Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+}
+
+@code {
+    private List<ExpenseApprovalResponse>? approvals;
+    private bool isLoading = true;
+    private bool isApprovalModalVisible = false;
+    private string approvalDescription = "";
+    private long selectedExpenseId = 0;
+    private ExpenseApprovalStatus approvalStatusToSet;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApprovals();
+    }
+
+    private async Task LoadApprovals()
+    {
+        isLoading = true;
+        try
+        {
+            approvals = await Http.GetFromJsonAsync<List<ExpenseApprovalResponse>>("expense-approvals?IncludeExpense=true");
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowError("Veriler yüklenirken hata oluştu: " + ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task Approve(long expenseId)
+    {
+        var response = await Http.PostAsJsonAsync("expense-approvals", new CreateExpenseApprovalRequest
+            {
+                ExpenseId = expenseId,
+                Status = ExpenseApprovalStatus.Approved,
+                Description = "Onaylandı."
+            });
+
+        if (response.IsSuccessStatusCode)
+        {
+            Toast.ShowSuccess("Masraf onaylandı.");
+            await LoadApprovals();
+        }
+        else
+        {
+            Toast.ShowError("Onaylama başarısız oldu.");
+        }
+    }
+
+    private async Task Reject(long expenseId)
+    {
+        var response = await Http.PostAsJsonAsync("expense-approvals", new CreateExpenseApprovalRequest
+            {
+                ExpenseId = expenseId,
+                Status = ExpenseApprovalStatus.Rejected,
+                Description = "Reddedildi."
+            });
+
+        if (response.IsSuccessStatusCode)
+        {
+            Toast.ShowSuccess("Masraf reddedildi.");
+            await LoadApprovals();
+        }
+        else
+        {
+            Toast.ShowError("Reddetme başarısız oldu.");
+        }
+    }
+
+    private async Task Revert(long approvalId)
+    {
+        var response = await Http.PostAsJsonAsync($"expense-approvals/revert/{approvalId}", "Geri alındı.");
+        if (response.IsSuccessStatusCode)
+        {
+            Toast.ShowSuccess("İşlem geri alındı.");
+            await LoadApprovals();
+        }
+        else
+        {
+            Toast.ShowError("Geri alma başarısız oldu.");
+        }
+    }
+    private void ShowApprovalModal(long expenseId, ExpenseApprovalStatus status)
+    {
+        selectedExpenseId = expenseId;
+        approvalStatusToSet = status;
+        approvalDescription = "";
+        isApprovalModalVisible = true;
+    }
+    private async Task HandleApprovalSubmit()
+    {
+        try
+        {
+            if (approvalStatusToSet == ExpenseApprovalStatus.Rejected)
+            {
+                var rejectRequest = new CreateExpenseApprovalRequest
+                    {
+                        ExpenseId = selectedExpenseId,
+                        Status = ExpenseApprovalStatus.Rejected,
+                        Description = approvalDescription
+                    };
+
+                var rejectResponse = await Http.PostAsJsonAsync("expense-approvals", rejectRequest);
+                if (rejectResponse.IsSuccessStatusCode)
+                {
+                    Toast.ShowSuccess("Masraf reddedildi.");
+                    await LoadApprovals();
+                }
+                else
+                {
+                    await ValidationErrorHelper.ShowErrorsAsync(rejectResponse, Toast);
+                }
+            }
+            else
+            {
+                var approveRequest = new CreateAndTransferApprovalRequest
+                    {
+                        ExpenseId = selectedExpenseId,
+                        CompanyId = 1,
+                        Description = approvalDescription
+                    };
+
+                var approveResponse = await Http.PostAsJsonAsync("expense-approvals/approve-and-transfer", approveRequest);
+                if (approveResponse.IsSuccessStatusCode)
+                {
+                    Toast.ShowSuccess("Masraf onaylandı ve ödeme simüle edildi.");
+                    await LoadApprovals();
+                }
+                else
+                {
+                    await ValidationErrorHelper.ShowErrorsAsync(approveResponse, Toast);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowError("Beklenmedik bir hata: " + ex.Message);
+        }
+        finally
+        {
+            isApprovalModalVisible = false;
+        }
+    }
+
+}
