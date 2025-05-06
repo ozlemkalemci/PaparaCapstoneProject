@@ -1,0 +1,4618 @@
+{
+	"info": {
+		"_postman_id": "f5a185d3-c130-48fa-add5-d23d5b8135ee",
+		"name": "Papara.WebApi",
+		"description": "📘 **Papara Masraf Yönetim Sistemi API Koleksiyonu**\n\nBu koleksiyon, Papara projesi kapsamında geliştirilen saha personelinin masraf takibi ve yöneticilerin onaylama & ödeme işlemlerini yürüttüğü uçtan uca masraf yönetimi sistemini kapsamaktadır.\n\nKoleksiyon; kimlik doğrulama, çalışan yönetimi, masraf girişleri, onay-red mekanizması, dosya yükleme, banka ödeme simülasyonu ve kapsamlı raporlama modüllerini içerir.\n\n---\n\n🔐 **Kimlik Doğrulama**\n\n- API erişimi JWT Bearer Token ile sağlanır.\n    \n- Giriş (`/api/auth/login`) sonrası `accessToken`, `bearerToken` değişkenine otomatik olarak aktarılır.\n    \n- Tüm yetkili isteklerde şu header kullanılmalıdır:  \n    **Authorization: Bearer {{bearerToken}}**\n    \n- Token süresi dolduğunda `/api/auth/refresh-token` ile yenilenir.\n    \n- Redis üzerinde **token blacklist** mekanizması aktiftir.\n    \n\n---\n\n⚙️ **Kurulum Bilgisi**\n\nRedis bağlantısı açık olmalıdır. `appsettings.json` dosyasına aşağıdaki ayarları eklemeyi unutmayın:\n\n```\n\"RedisConnection\": \"localhost:6379\",\n\"ConnectionStrings\": {\n  \"PaparaSqlConnection\": \"Server=.;Initial Catalog=PaparaDb;Integrated Security=true;TrustServerCertificate=True;\",\n  \"BankSqlConnection\": \"Server=.;Initial Catalog=BankDb;Integrated Security=true;TrustServerCertificate=True;\"\n}\n\n ```\n\nGerekirse Redis şu şekilde ayağa kaldırılabilir:\n\n```\ndocker run -p 6379:6379 redis\n\n ```\n\n---\n\n🧱 **Migration Komutları**\n\nYeni migration eklemek için:\n\n```\ndotnet ef migrations add InitialCreate_App --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context AppDbContext --output-dir Migrations/Papara\ndotnet ef migrations add InitialCreate_Bank --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context BankDbContext --output-dir Migrations/Bank\n\n ```\n\nVeritabanına migrationları uygulamak için:\n\n```\ndotnet ef database update --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context AppDbContext\ndotnet ef database update --startup-project src/Presentation/Papara.WebApi --project src/Base/Base.Persistence --context BankDbContext\n\n ```\n\n---\n\n📦 **Modül Başlıkları**\n\n- **Auth:** Kullanıcı girişi, kayıt, token yenileme, çıkış\n    \n- **Departments:** Departman CRUD işlemleri (sadece Admin)\n    \n- **Employees:** Personel ve iletişim bilgileri yönetimi\n    \n- **Expenses:** Masraf talepleri\n    \n- **ExpenseTypes:** Masraf türleri (sadece Admin)\n    \n- **ExpenseAttachments:** Dosya ekleri\n    \n- **ExpenseApprovals:** Onay / red işlemleri\n    \n- **Bank:** Onay sonrası ödeme simülasyonu\n    \n- **Reports:** Dapper destekli gelişmiş raporlar\n    \n\n---\n\n📊 **Raporlama Modülü**\n\nRaporlar Dapper ile hızlı sorgular üzerinden alınır. Aşağıdaki view ve stored procedure’ler kullanılır:\n\n- `GET /api/reports/personnel-history?employeeId=3`\n    \n    → Personelin kendi geçmiş harcamaları (vw_PersonnelExpenseHistory View)\n    \n- `GET /api/reports/admin-summary?period=monthly`\n    \n    → Günlük / Haftalık / Aylık harcama toplamı (sp_GetAdminExpenseSummaryReport)\n    \n- `GET /api/reports/personnel-summary?period=weekly`\n    \n    → Personel bazlı harcama özeti (sp_GetPersonnelSpendingSummary)\n    \n- `GET /api/reports/approval-status-summary?period=daily`\n    \n    → Onay/red bazlı özet (sp_GetExpenseApprovalStatusSummary)\n    \n\n---\n\n🛠️ **Teknik Yığın**\n\n- ASP.NET Core 8 Web API\n    \n- Entity Framework Core + Dapper\n    \n- SQL Server (PaparaDb, BankDb)\n    \n- Redis (JWT blacklist için)\n    \n- Swagger / Postman destekli test altyapısı",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44362149",
+		"_collection_link": "https://ozlem-2520712.postman.co/workspace/Ozlem's-Workspace~485a9068-a0d4-45a4-88bd-3bcfa10b7a96/collection/44362149-f5a185d3-c130-48fa-add5-d23d5b8135ee?action=share&source=collection_link&creator=44362149"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "login",
+							"item": [
+								{
+									"name": "Sisteme giriş yapar ve JWT token döner.",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const json = pm.response.json();\r",
+													"pm.collectionVariables.set(\"bearerToken\", json.accessToken);\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userName\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/login",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"login"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"userName\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/login",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"login"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "register",
+							"item": [
+								{
+									"name": "Yeni kullanıcı kaydı oluşturur.",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userName\": \"<string>\",\n  \"password\": \"<string>\",\n  \"role\": 2,\n  \"email\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/register",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"register"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"userName\": \"<string>\",\n  \"password\": \"<string>\",\n  \"role\": 2,\n  \"email\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/register",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"register"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "logout",
+							"item": [
+								{
+									"name": "Oturumu sonlandırır ve token’ı kara listeye ekler.",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/logout",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"logout"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/logout",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"logout"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "refresh-token",
+							"item": [
+								{
+									"name": "Yeni bir access token almak için refresh token kullanılır.",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"refreshToken\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/refresh-token",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"refresh-token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"refreshToken\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/refresh-token",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"refresh-token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					],
+					"description": "### 📁 **Auth**\n\n**Açıklama:**\n\nKimlik doğrulama işlemlerinin yapıldığı bölümdür. Kullanıcı sisteme giriş yapar, yeni kullanıcı kaydı oluşturur, access token'ı yeniler ve sistemden çıkış yapar.\n\n> ⚠️ Tüm işlemler JWT temellidir. Logout işlemi, JWT token’ın Redis üzerinde blacklist'e alınmasıyla sağlanır. Böylece access token süresi dolmadan da geçersiz hale getirilir. Bu yüzden Redis connectionunuz açık olmalıdır. \n  \n\n**İçerir:**\n\n- `POST /api/Auth/login` – Kullanıcı girişi (token alır)\n    \n- `POST /api/Auth/register` – Yeni kullanıcı kaydı (Admin rolü gerektirir)\n    \n- `POST /api/Auth/refresh-token` – Erişim token'ı yeniler (Refresh Token gönderilmelidir)\n    \n- `POST /api/Auth/logout` – Kullanıcı oturumunu sonlandırır (Redis’e token blacklist olarak yazılır)"
+				},
+				{
+					"name": "bank-accounts",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir banka hesabını ID'ye göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/bank-accounts/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"bank-accounts",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Banka hesap ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/bank-accounts/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"bank-accounts",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Var olan bir banka hesabını günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"accountHolderName\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"accountType\": 2\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/bank-accounts/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"bank-accounts",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Güncellenecek hesap ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"accountHolderName\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"accountType\": 2\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/bank-accounts/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"bank-accounts",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirli bir banka hesabını siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/bank-accounts/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"bank-accounts",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek hesap ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/bank-accounts/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"bank-accounts",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm banka hesaplarını listeler.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/bank-accounts",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"bank-accounts"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/bank-accounts",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"bank-accounts"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir banka hesabı oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"accountHolderName\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"accountType\": 2\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/bank-accounts",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"bank-accounts"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"accountHolderName\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"accountType\": 2\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/bank-accounts",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"bank-accounts"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 Bank Accounts\n\n**Açıklama:**\n\nSimülasyon için gereklidir. Masraf ödemesi yapacağınız kullanıcı yeni oluşturulmuşsa onun IBAN bilgilerini içeren banka hesabı açılmalıdır. Banka hesabı şirketin masraf yönetimine dahil olmayan dış bir yapıdır. IBANdan IBANa para gönderme işlemi için oluşturulmuştur diğer tablolarla bağlantısı yoktur."
+				},
+				{
+					"name": "companies",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir şirketi ID'ye göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/companies/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"companies",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Şirket ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/companies/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"companies",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Mevcut bir şirketi günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"companyName\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"companyIBAN\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/companies/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"companies",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Güncellenecek şirketin ID'si"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"companyName\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"companyIBAN\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/companies/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"companies",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirli bir şirketi siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/companies/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"companies",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek şirketin ID'si"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/companies/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"companies",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm şirket kayıtlarını filtrelenmiş şekilde getirir.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/companies",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"companies"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/companies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"companies"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir şirket oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"companyName\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"companyIBAN\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/companies",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"companies"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"companyName\": \"<string>\",\n  \"taxNumber\": \"<string>\",\n  \"companyIBAN\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/companies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"companies"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 Companies\n\n**Açıklama:**\n\nÖdeme sistemi için gereklidir. Şirketin kurumsal banka hesabından personele ödeme yapılmaktadır. Şirket seed ile oluşturulmuştur. Yine de crud işlemleri yazılmıştır."
+				},
+				{
+					"name": "departments",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir departmanı ID'ye göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/departments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"departments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Departman ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/departments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"departments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Var olan bir departmanı günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"departmentName\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/departments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"departments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Güncellenecek departmanın ID'si"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"departmentName\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/departments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"departments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirtilen ID'ye sahip departmanı siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/departments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"departments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek departman ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/departments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"departments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm departmanları getirir. İsteğe bağlı filtreleme desteklenir.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/departments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"departments"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/departments",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"departments"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir departman oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"departmentName\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/departments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"departments"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"departmentName\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/departments",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"departments"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 Departments\n\n**Açıklama:**\n\nŞirket içinde tanımlı departmanları yönetmek için kullanılır. Yalnızca Admin rolündeki kullanıcılar yeni departman oluşturabilir, düzenleyebilir ya da silebilir. Personel sadece görüntüleyebilir.\n\n**İçerir:**\n\n- `GET /api/Departments` – Tüm departmanları listeler (Admin, Employee)\n    \n- `GET /api/Departments/{id}` – Departman detayını getirir\n    \n- `POST /api/Departments` – Yeni departman oluşturur (Admin only)\n    \n- `PUT /api/Departments/{id}` – Departmanı günceller (Admin only)\n    \n- `DELETE /api/Departments/{id}` – Departmanı siler (Admin only)"
+				},
+				{
+					"name": "employeeaddresses",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir çalışanın adresini ID'ye göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeeaddresses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Adres ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeeaddresses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Çalışan adresini günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"city\": \"<string>\",\n  \"district\": \"<string>\",\n  \"detail\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeeaddresses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Adres ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"city\": \"<string>\",\n  \"district\": \"<string>\",\n  \"detail\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeeaddresses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Çalışan adresini siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeeaddresses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek adresin ID'si"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employeeaddresses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeeaddresses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm çalışan adreslerini listeler.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/employeeaddresses?City=<string>&District=<string>&Detail=<string>&EmployeeId=<long>&IncludeEmployee=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employeeaddresses"
+									],
+									"query": [
+										{
+											"key": "City",
+											"value": "<string>"
+										},
+										{
+											"key": "District",
+											"value": "<string>"
+										},
+										{
+											"key": "Detail",
+											"value": "<string>"
+										},
+										{
+											"key": "EmployeeId",
+											"value": "<long>"
+										},
+										{
+											"key": "IncludeEmployee",
+											"value": "<boolean>"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeeaddresses?City=<string>&District=<string>&Detail=<string>&EmployeeId=<long>&IncludeEmployee=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeeaddresses"
+											],
+											"query": [
+												{
+													"key": "City",
+													"value": "<string>"
+												},
+												{
+													"key": "District",
+													"value": "<string>"
+												},
+												{
+													"key": "Detail",
+													"value": "<string>"
+												},
+												{
+													"key": "EmployeeId",
+													"value": "<long>"
+												},
+												{
+													"key": "IncludeEmployee",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir çalışan adresi oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"city\": \"<string>\",\n  \"district\": \"<string>\",\n  \"detail\": \"<string>\",\n  \"employeeId\": \"<long>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/employeeaddresses",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employeeaddresses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"city\": \"<string>\",\n  \"district\": \"<string>\",\n  \"detail\": \"<string>\",\n  \"employeeId\": \"<long>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employeeaddresses",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeeaddresses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 EmployeeAddresses\n\n**Açıklama:**\n\nÇalışanların adres bilgilerini yönetir. Admin tüm çalışanlar için işlem yapabilirken, personel sadece kendisine ait veriler üzerinde işlem yapabilir.\n\n**İçerir:**\n\n- `GET /api/employeeaddresses` – Adresleri listeler (Admin tüm, Personel kendisi)\n    \n- `GET /api/employeeaddresses/{id}` – Adres detaylarını getirir\n    \n- `POST /api/employeeaddresses` – Yeni adres ekler\n    \n- `PUT /api/employeeaddresses/{id}` – Adresi günceller\n    \n- `DELETE /api/employeeaddresses/{id}` – Adresi siler"
+				},
+				{
+					"name": "employeephones",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Telefon bilgisini ID’ye göre getirir. Admin ve ilgili çalışan erişebilir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeephones/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeephones",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employeephones/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeephones",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Telefon bilgilerini günceller. Admin ve ilgili çalışan kullanabilir.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"phoneNumber\": \"<string>\",\n  \"isPrimary\": \"<boolean>\",\n  \"type\": 3\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employeephones/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeephones",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"phoneNumber\": \"<string>\",\n  \"isPrimary\": \"<boolean>\",\n  \"type\": 3\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/employeephones/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeephones",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Telefon bilgisini siler. Admin ve ilgili çalışan kullanabilir.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeephones/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeephones",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employeephones/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employeephones",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Çalışanlara ait telefonları listeler. Admin ve ilgili çalışan erişebilir.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/employeephones?IsPrimary=<boolean>&EmployeeId=<long>&IncludeEmployee=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employeephones"
+									],
+									"query": [
+										{
+											"key": "IsPrimary",
+											"value": "<boolean>"
+										},
+										{
+											"key": "EmployeeId",
+											"value": "<long>"
+										},
+										{
+											"key": "IncludeEmployee",
+											"value": "<boolean>"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/employeephones?IsPrimary=<boolean>&EmployeeId=<long>&IncludeEmployee=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeephones"
+											],
+											"query": [
+												{
+													"key": "IsPrimary",
+													"value": "<boolean>"
+												},
+												{
+													"key": "EmployeeId",
+													"value": "<long>"
+												},
+												{
+													"key": "IncludeEmployee",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni telefon bilgisi ekler. Admin ve ilgili çalışan kullanabilir.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"phoneNumber\": \"<string>\",\n  \"isPrimary\": \"<boolean>\",\n  \"employeeId\": \"<long>\",\n  \"type\": 1\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/employeephones",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employeephones"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"phoneNumber\": \"<string>\",\n  \"isPrimary\": \"<boolean>\",\n  \"employeeId\": \"<long>\",\n  \"type\": 1\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employeephones",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employeephones"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 EmployeePhones\n\n**Açıklama:**\n\nÇalışanların telefon bilgilerini yönetir. Admin tüm çalışanlar için işlem yapabilir, personel sadece kendisine ait veriler üzerinde işlem yapabilir.\n\n**İçerir:**\n\n- `GET /api/employeephones` – Telefonları listeler (Admin tüm, Personel kendisi)\n    \n- `GET /api/employeephones/{id}` – Telefon detayını getirir\n    \n- `POST /api/employeephones` – Yeni telefon bilgisi ekler\n    \n- `PUT /api/employeephones/{id}` – Telefon bilgisi günceller\n    \n- `DELETE /api/employeephones/{id}` – Telefon bilgisini siler"
+				},
+				{
+					"name": "employees",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Çalışanı ID'ye göre getirir. Admin ve ilgili çalışan erişebilir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employees/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employees",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employees/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employees",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Mevcut çalışan kaydını günceller. Sadece admin kullanabilir.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userId\": \"<long>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employees/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employees",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"userId\": \"<long>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/employees/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employees",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Çalışanı siler. Sadece admin kullanabilir.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/employees/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employees",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/employees/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"employees",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm çalışanları listeler. Yalnızca admin tüm personeli görüntülemeye yetkilidir. Employee sadece kendisini görür.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/employees?DepartmentId=<long>&IncludeUser=<boolean>&IncludeDepartment=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employees"
+									],
+									"query": [
+										{
+											"key": "DepartmentId",
+											"value": "<long>"
+										},
+										{
+											"key": "IncludeUser",
+											"value": "<boolean>"
+										},
+										{
+											"key": "IncludeDepartment",
+											"value": "<boolean>"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/employees?DepartmentId=<long>&IncludeUser=<boolean>&IncludeDepartment=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employees"
+											],
+											"query": [
+												{
+													"key": "DepartmentId",
+													"value": "<long>"
+												},
+												{
+													"key": "IncludeUser",
+													"value": "<boolean>"
+												},
+												{
+													"key": "IncludeDepartment",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni çalışan kaydı oluşturur. Sadece admin kullanabilir.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"firstName\": \"<string>\",\n  \"middleName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"userId\": \"<long>\",\n  \"departmentId\": \"<long>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/employees",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employees"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"firstName\": \"<string>\",\n  \"middleName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"identityNumber\": \"<string>\",\n  \"iban\": \"<string>\",\n  \"userId\": \"<long>\",\n  \"departmentId\": \"<long>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employees",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employees"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 Çalışan Bilgileri\n\n**Açıklama:**\n\nÇalışan (employee) tanımları yapılır. Admin, tüm çalışanları yönetebilir. Personel yalnızca kendi bilgilerini görüntüleyebilir.\n\n**İçerir:**\n\n- `GET /api/employees` → Tüm çalışanları getirir (Admin).\n    \n- `GET /api/employees/{id}` → Belirli bir çalışanın detay bilgisi.\n    \n- `POST /api/employees` → Yeni çalışan tanımlar (Admin).\n    \n- `PUT /api/employees/{id}` → Çalışanı günceller.\n    \n- `DELETE /api/employees/{id}` → Çalışanı siler."
+				},
+				{
+					"name": "employee-users",
+					"item": [
+						{
+							"name": "Kullanıcı oluşturur ve çalışan kaydı ile ilişkilendirir. Sadece admin yapabilir.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"request\": {\n    \"userName\": \"<string>\",\n    \"password\": \"<string>\",\n    \"role\": 1,\n    \"email\": \"<string>\"\n  },\n  \"employeeId\": \"<long>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/employee-users",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"employee-users"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"request\": {\n    \"userName\": \"<string>\",\n    \"password\": \"<string>\",\n    \"role\": 1,\n    \"email\": \"<string>\"\n  },\n  \"employeeId\": \"<long>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/employee-users",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"employee-users"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 Employee Users\n\n**Açıklama:**\n\nKullanıcı oluşturup personeli user id ile güncelleyen servis işlemini içerir."
+				},
+				{
+					"name": "expense-approvals",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir masraf onay kaydını getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expense-approvals/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expense-approvals",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) "
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expense-approvals/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expense-approvals",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "revert",
+							"item": [
+								{
+									"name": "{id}",
+									"item": [
+										{
+											"name": "Onaylanmış bir masraf kaydını geri çeker",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "<string>",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expense-approvals/revert/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expense-approvals",
+														"revert",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "<long>",
+															"description": "(Required) "
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "OK",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Authorization",
+																"value": "Bearer <token>",
+																"description": "Added as a part of security scheme: bearer"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "<string>",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/expense-approvals/revert/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"expense-approvals",
+																"revert",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "approve-and-transfer",
+							"item": [
+								{
+									"name": "Masrafı onaylar ve eş zamanlı olarak tanımlı IBAN'lara para transferini gerçekleştirir. BankAccount tablosunda IBANların karşılığı olmalıdır.",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"expenseId\": \"<long>\",\n  \"companyId\": \"<long>\",\n  \"description\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expense-approvals/approve-and-transfer",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expense-approvals",
+												"approve-and-transfer"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"expenseId\": \"<long>\",\n  \"companyId\": \"<long>\",\n  \"description\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expense-approvals/approve-and-transfer",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expense-approvals",
+														"approve-and-transfer"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "transfer",
+							"item": [
+								{
+									"name": "Daha önce onaylanmış bir masraf için manuel olarak yalnızca ödeme işlemini başlatır.",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"senderIBAN\": \"<string>\",\n  \"receiverIBAN\": \"<string>\",\n  \"amount\": \"<double>\",\n  \"transferType\": 2,\n  \"expenseId\": \"<long>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expense-approvals/transfer",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expense-approvals",
+												"transfer"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"senderIBAN\": \"<string>\",\n  \"receiverIBAN\": \"<string>\",\n  \"amount\": \"<double>\",\n  \"transferType\": 2,\n  \"expenseId\": \"<long>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expense-approvals/transfer",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expense-approvals",
+														"transfer"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm masraf onaylarını filtreli olarak listeler. Admin tüm personelin, Employee kendisinin onaylarını görebilir.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/expense-approvals?EmployeeId=<long>&ExpenseId=<long>&IncludeExpense=<boolean>&Status=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expense-approvals"
+									],
+									"query": [
+										{
+											"key": "EmployeeId",
+											"value": "<long>"
+										},
+										{
+											"key": "ExpenseId",
+											"value": "<long>"
+										},
+										{
+											"key": "IncludeExpense",
+											"value": "<boolean>"
+										},
+										{
+											"key": "Status",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/expense-approvals?EmployeeId=<long>&ExpenseId=<long>&IncludeExpense=<boolean>&Status=3",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expense-approvals"
+											],
+											"query": [
+												{
+													"key": "EmployeeId",
+													"value": "<long>"
+												},
+												{
+													"key": "ExpenseId",
+													"value": "<long>"
+												},
+												{
+													"key": "IncludeExpense",
+													"value": "<boolean>"
+												},
+												{
+													"key": "Status",
+													"value": "3"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yalnızca onaylama işlemi yapar. Para transferi gerçekleştirmez.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"expenseId\": \"<long>\",\n  \"status\": 3,\n  \"description\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/expense-approvals",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expense-approvals"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"expenseId\": \"<long>\",\n  \"status\": 3,\n  \"description\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expense-approvals",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expense-approvals"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 ExpenseApprovals\n\n**Açıklama:**\n\nMasraf taleplerinin onaylandığı ya da reddedildiği işlemler burada yapılır. Sadece Admin rolündeki kullanıcılar işlem yapabilir.\n\n**İçerir:**\n\n- `GET /api/expense-approvals`  \n      \n    → Mevcut onayları listeler.  \n      \n    • Admin: tüm personel masraflarını görebilir  \n      \n    • Employee: yalnızca kendi masraflarını görebilir\n    \n- `GET /api/expense-approvals/{id}`  \n      \n    → Belirli bir onay kaydını getirir. (Admin only)\n    \n- `POST /api/expense-approvals`  \n      \n    → **Sadece onay işlemi yapılır**, henüz ödeme yapılmaz. (Admin only)\n    \n- `POST /api/expense-approvals/revert/{id}`  \n      \n    → Daha önce onaylanmış masrafın onayı geri alınır. (Admin only)\n    \n- `POST /api/expense-approvals/approve-and-transfer`  \n      \n    → **Masraf onaylanır ve aynı anda ödeme simülasyonu gerçekleştirilir.**  \n      \n    • Bu işlemde, çalışanın IBAN'ı `BankAccount` tablosunda tanımlı olmalıdır.  \n      \n    • Onaylama ve para transferi tek bir işlemde tamamlanır. (Admin only)\n    \n- `POST /api/expense-approvals/transfer`  \n      \n    → Daha önce onaylanmış bir masraf için **manuel olarak sadece ödeme** işlemi yapılır. (Admin only)  \n      \n    • Genellikle sonradan ödeme yapılmak istendiğinde kullanılır."
+				},
+				{
+					"name": "expenseattachments",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir masraf ek dosyasını ID ile getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenseattachments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenseattachments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Ek dosya ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expenseattachments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenseattachments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Mevcut bir masraf ek dosyasını günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "File",
+													"type": "file",
+													"src": []
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expenseattachments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenseattachments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Güncellenecek ek dosyanın ID'si"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "multipart/form-data"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "formdata",
+													"formdata": [
+														{
+															"key": "File",
+															"type": "file",
+															"src": []
+														}
+													]
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expenseattachments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenseattachments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirli bir masraf ek dosyasını siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenseattachments/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenseattachments",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek dosya ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expenseattachments/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenseattachments",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Masraf ekine ait tüm dosyaları listeler. İsteğe bağlı filtre uygulanabilir.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/expenseattachments?ExpenseId=<long>&IncludeExpense=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expenseattachments"
+									],
+									"query": [
+										{
+											"key": "ExpenseId",
+											"value": "<long>"
+										},
+										{
+											"key": "IncludeExpense",
+											"value": "<boolean>"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenseattachments?ExpenseId=<long>&IncludeExpense=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenseattachments"
+											],
+											"query": [
+												{
+													"key": "ExpenseId",
+													"value": "<long>"
+												},
+												{
+													"key": "IncludeExpense",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir masraf ek dosyası yükler.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "multipart/form-data"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "ExpenseId",
+											"value": "<long>",
+											"type": "text"
+										},
+										{
+											"key": "File",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "Description",
+											"value": "<string>",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/expenseattachments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expenseattachments"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "ExpenseId",
+													"value": "<long>",
+													"type": "text"
+												},
+												{
+													"key": "File",
+													"type": "file",
+													"src": []
+												},
+												{
+													"key": "Description",
+													"value": "<string>",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expenseattachments",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenseattachments"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 ExpenseAttachments\n\n**Açıklama:**\n\nMasraf taleplerine ait fiş, fatura vb. belgelerin yüklendiği alandır. Dosyalar multipart/form-data olarak gönderilmelidir.\n\n**İçerir:**\n\n- `GET /api/expenseattachments` – Ekleri listeler\n    \n- `GET /api/expenseattachments/{id}` – Ek detayını getirir\n    \n- `POST /api/expenseattachments` – Yeni dosya yükler (form-data içinde `file`)\n    \n- `PUT /api/expenseattachments/{id}` – Dosya günceller\n    \n- `DELETE /api/expenseattachments/{id}` – Dosya siler"
+				},
+				{
+					"name": "expensereports",
+					"item": [
+						{
+							"name": "personnel-expense-history",
+							"item": [
+								{
+									"name": "Personelin kendi taleplerini ve detaylarını görebileceği rapordur. Personelin kendi işlem hareketlerini getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensereports/personnel-expense-history?EmployeeId=<long>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensereports",
+												"personnel-expense-history"
+											],
+											"query": [
+												{
+													"key": "EmployeeId",
+													"value": "<long>"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensereports/personnel-expense-history?EmployeeId=<long>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensereports",
+														"personnel-expense-history"
+													],
+													"query": [
+														{
+															"key": "EmployeeId",
+															"value": "<long>"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "admin-summary",
+							"item": [
+								{
+									"name": "Şirket yönetimi tarafından toplam ödeme yoğunluğunu izlemek için kullanılır. Günlük, haftalık ve aylık toplam ödeme özetini getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensereports/admin-summary?Period=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensereports",
+												"admin-summary"
+											],
+											"query": [
+												{
+													"key": "Period",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensereports/admin-summary?Period=0",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensereports",
+														"admin-summary"
+													],
+													"query": [
+														{
+															"key": "Period",
+															"value": "0"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "personnel-spending-summary",
+							"item": [
+								{
+									"name": "Şirketin personel bazlı harcama yoğunluğunu dönemsel olarak analiz etmesini sağlar.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensereports/personnel-spending-summary?Period=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensereports",
+												"personnel-spending-summary"
+											],
+											"query": [
+												{
+													"key": "Period",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensereports/personnel-spending-summary?Period=0",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensereports",
+														"personnel-spending-summary"
+													],
+													"query": [
+														{
+															"key": "Period",
+															"value": "0"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "approval-status-summary",
+							"item": [
+								{
+									"name": "Günlük, haftalık ve aylık dönemlerde masraf onay/red istatistiklerini raporlamak için kullanılır.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensereports/approval-status-summary?Period=0",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensereports",
+												"approval-status-summary"
+											],
+											"query": [
+												{
+													"key": "Period",
+													"value": "0"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensereports/approval-status-summary?Period=0",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensereports",
+														"approval-status-summary"
+													],
+													"query": [
+														{
+															"key": "Period",
+															"value": "0"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					],
+					"description": "### 📁 Reports\n\n**Açıklama:**\n\nDapper, View ve Stored Procedure destekli raporlama endpointleridir. Kullanıcı rolüne göre veri sınırlamaları uygulanır.\n\n**İçerir:**\n\n- `GET /api/reports/personnel-history?employeeId=3` – Personelin kendi harcama geçmişi (Personel için)\n    \n- `GET /api/reports/admin-summary?period=weekly` – Günlük/haftalık/aylık toplam harcamalar (Admin)\n    \n- `GET /api/reports/personnel-summary?period=weekly` – Personel bazlı toplam harcamalar (Admin)\n    \n- `GET /api/reports/approval-status-summary?period=weekly` – Onay/red bazlı harcamalar (Admin)"
+				},
+				{
+					"name": "expenses",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir masraf kaydını ID'ye göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Masraf ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expenses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Mevcut bir masraf kaydını günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"amount\": \"<double>\",\n  \"description\": \"<string>\",\n  \"expenseDate\": \"<dateTime>\",\n  \"expenseTypeId\": \"<long>\",\n  \"isActive\": \"<boolean>\",\n  \"concluded\": \"<boolean>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expenses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Masraf ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"amount\": \"<double>\",\n  \"description\": \"<string>\",\n  \"expenseDate\": \"<dateTime>\",\n  \"expenseTypeId\": \"<long>\",\n  \"isActive\": \"<boolean>\",\n  \"concluded\": \"<boolean>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expenses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirli bir masraf kaydını siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenses/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenses",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Masraf ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expenses/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expenses",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm masraf kayıtlarını filtreleyerek listeler.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/expenses?Concluded=<boolean>&EmployeeId=<long>&ExpenseTypeId=<long>&StartDate=<dateTime>&EndDate=<dateTime>&PaymentMethod=2&IncludeEmployee=<boolean>&IncludeExpenseType=<boolean>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expenses"
+									],
+									"query": [
+										{
+											"key": "Concluded",
+											"value": "<boolean>"
+										},
+										{
+											"key": "EmployeeId",
+											"value": "<long>"
+										},
+										{
+											"key": "ExpenseTypeId",
+											"value": "<long>"
+										},
+										{
+											"key": "StartDate",
+											"value": "<dateTime>"
+										},
+										{
+											"key": "EndDate",
+											"value": "<dateTime>"
+										},
+										{
+											"key": "PaymentMethod",
+											"value": "2"
+										},
+										{
+											"key": "IncludeEmployee",
+											"value": "<boolean>"
+										},
+										{
+											"key": "IncludeExpenseType",
+											"value": "<boolean>"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/expenses?Concluded=<boolean>&EmployeeId=<long>&ExpenseTypeId=<long>&StartDate=<dateTime>&EndDate=<dateTime>&PaymentMethod=2&IncludeEmployee=<boolean>&IncludeExpenseType=<boolean>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenses"
+											],
+											"query": [
+												{
+													"key": "Concluded",
+													"value": "<boolean>"
+												},
+												{
+													"key": "EmployeeId",
+													"value": "<long>"
+												},
+												{
+													"key": "ExpenseTypeId",
+													"value": "<long>"
+												},
+												{
+													"key": "StartDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "EndDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "PaymentMethod",
+													"value": "2"
+												},
+												{
+													"key": "IncludeEmployee",
+													"value": "<boolean>"
+												},
+												{
+													"key": "IncludeExpenseType",
+													"value": "<boolean>"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir masraf kaydı oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"employeeId\": \"<long>\",\n  \"expenseTypeId\": \"<long>\",\n  \"amount\": \"<double>\",\n  \"description\": \"<string>\",\n  \"expenseDate\": \"<dateTime>\",\n  \"location\": \"<string>\",\n  \"paymentMethod\": 4\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/expenses",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expenses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"employeeId\": \"<long>\",\n  \"expenseTypeId\": \"<long>\",\n  \"amount\": \"<double>\",\n  \"description\": \"<string>\",\n  \"expenseDate\": \"<dateTime>\",\n  \"location\": \"<string>\",\n  \"paymentMethod\": 4\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expenses",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expenses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 **Expenses**\n\n**Açıklama:**\n\nSaha personelinin masraf taleplerini oluşturduğu, yöneticilerin ise bu talepleri onaylayıp ödeme sürecine dahil ettiği bölümdür.\n\nPersonel yalnızca kendi taleplerini görüntüleyip oluşturabilir. Tüm CRUD yetkileri rol bazlıdır.\n\n**İçerir:**\n\n- `GET /api/expenses`Tüm masraf taleplerini listeler (**Employee:** sadece kendi talepleri, **Admin:** tüm talepler)\n    \n- `GET /api/expenses/{id}` Masraf talebi detayını getirir (Yetkili kullanıcılar)\n    \n- `POST /api/expenses` Yeni masraf talebi oluşturur (**Employee only**)\n    \n- `PUT /api/expenses/{id}` Masraf talebini günceller (**Employee:** _Yalnızca kendi talebini ve onaylanmamış talepleri düzenleyebilir.)_\n    \n- `DELETE /api/expenses/{id}` Masraf talebini siler"
+				},
+				{
+					"name": "expensetypes",
+					"item": [
+						{
+							"name": "{id}",
+							"item": [
+								{
+									"name": "Belirli bir masraf türünü ID bilgisine göre getirir.",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensetypes/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensetypes",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Masraf türü ID bilgisi"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensetypes/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensetypes",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Var olan bir masraf türünü günceller.",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expensetypes/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensetypes",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Masraf türü ID"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"name\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/expensetypes/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensetypes",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								},
+								{
+									"name": "Belirli bir masraf türünü siler.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensetypes/:id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensetypes",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "<long>",
+													"description": "(Required) Silinecek masraf türünün ID bilgisi"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "OK",
+											"originalRequest": {
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer <token>",
+														"description": "Added as a part of security scheme: bearer"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/expensetypes/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"expensetypes",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Tüm masraf türlerini listeler.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/expensetypes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expensetypes"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/expensetypes",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensetypes"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Yeni bir masraf türü oluşturur.",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/expensetypes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"expensetypes"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "OK",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer <token>",
+												"description": "Added as a part of security scheme: bearer"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"<string>\",\n  \"description\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/expensetypes",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"expensetypes"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					],
+					"description": "### 📁 ExpenseTypes\n\n**Açıklama:**\n\nMasraf kategorilerinin tanımlandığı bölümdür. Personel sadece listeleyebilir. CRUD işlemleri sadece Admin tarafından yapılır.\n\n**İçerir:**\n\n- `GET /api/expensetypes` – Tüm masraf kategorilerini listeler\n    \n- `GET /api/expensetypes/{id}` – Kategori detayını getirir\n    \n- `POST /api/expensetypes` – Yeni kategori oluşturur (Admin only)\n    \n- `PUT /api/expensetypes/{id}` – Kategoriyi günceller (Admin only)\n    \n- `DELETE /api/expensetypes/{id}` – Kategoriyi siler (Admin only)"
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearerToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7171"
+		},
+		{
+			"key": "bearerToken",
+			"value": ""
+		}
+	]
+}
